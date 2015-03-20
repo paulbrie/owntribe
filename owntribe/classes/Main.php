@@ -3,9 +3,12 @@ namespace owntribe\classes;
 class Main {
     private $version = 0.1;
     private $config = 0;
+    private $class;
 
-    function __construct($config) {
+    function __construct($config)
+    {
 		$this->config = $config;
+        $this->config['debug'] === true ? ini_set('display_errors', 1) : ini_set('display_errors', 0);
         $this->init();
 	}
 
@@ -23,8 +26,8 @@ class Main {
             $class_name = __NAMESPACE__ . '\\' . ucfirst($resource);
             $file = getPathFromNamespace($class_name);
             if(file_exists($file)) {
-                $Class = new $class_name;
-                $this->output($Class->getResult());
+                $this->class = new $class_name($this->config);
+                $this->output($this->class->getResult());
             } else {
                 $this->output (array('msg' => 'Oops! We don\'t have this resource: ' . $resource ));
             }

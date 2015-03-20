@@ -8,6 +8,22 @@ namespace owntribe\classes {
      * @author  Paul BRIE
      */
     class Base {
+
+        protected $db;
+
         use \owntribe\traits\Response;
+
+        function __construct($config)
+        {
+            try {
+                $this->db = new \PDO(
+                    'mysql:host=localhost;dbname=' . $config['dbname'] . ';charset=utf8',
+                    $config['dbuser'],
+                    $config['dbpass']
+                );
+            } catch (PDOException $e) {
+                $e->getMessage();
+            }
+        }
     }
 }
