@@ -5,4 +5,4 @@ If you are concerned about your online privacy, the ownership of your numeric li
 
 I am looking for designers, developers (php, javascript, nodejs, android, ios) and, more broadly, for people who are interested in defining and building the next social communication standard. If you want to be part of this incredible adventure, please contact me via twitter: https://twitter.com/aelythe.
 
-To start the adventure, click here: https://github.com/paulbrie/owntribe!
+Not convinced yet? Please click here to learn more: https://github.com/paulbrie/owntribe!
