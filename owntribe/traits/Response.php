@@ -1,6 +1,12 @@
 <?php
 namespace owntribe\traits;
-
+/**
+ * trait Response
+ * defines the response format the REST API
+ *
+ * @package owntribe\traits
+ * @author  Paul BRIE
+ */
 trait Response
 {
     /**

@@ -2,13 +2,16 @@
 namespace owntribe\classes;
 class Main {
     private $version = 0.1;
+    private $config = 0;
 
-    function __construct() {
-		$this->init();
+    function __construct($config) {
+		$this->config = $config;
+        $this->init();
 	}
 
     /**
-     * the init() function will try to instantiate the corresponding class/method depending on the URI request
+     * this function will try to instantiate the corresponding class/method depending on the URI request
+     * if it does not found the class corresponding to the resource it will give a default error
      *
      * @author  Paul BRIE
      */
@@ -23,8 +26,6 @@ class Main {
                 $Class = new $class_name;
                 $this->output($Class->getResult());
             } else {
-                $class_name = __NAMESPACE__ . '\\Error';
-                $Class = new $class_name;
                 $this->output (array('msg' => 'Oops! We don\'t have this resource: ' . $resource ));
             }
 		} else {
@@ -37,11 +38,10 @@ class Main {
      * @param array $result
      */
     protected function output($result) {
-        //var_dump($result);
+        header('Content-Type: application/json');
         // inject extra data
         $result['_version'] = $this->version;
-
-        header('Content-Type: application/json');
+        $result['_duration'] = round(microtime(true) - $this->config['start'], 3) . " sec";
         echo json_encode($result);
     }
 }

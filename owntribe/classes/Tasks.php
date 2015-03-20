@@ -1,13 +1,14 @@
 <?php
 namespace owntribe\classes;
 
-class Tasks {
-	use \owntribe\traits\Response;
-
-    private $result;
+class Tasks extends Base {
 
     function __construct() {
-		$data = array(
+		//
+	}
+
+    public function getResult() {
+        $data = array(
             array(
                 'id' => 1,
                 'title' => 'buy milk',
@@ -27,10 +28,6 @@ class Tasks {
                 'expires' => '2015-03-20'
             )
         );
-        $this->result = $this->respond(true, "Tasks class", $data);
-	}
-
-    public function getResult() {
-        return $this->result;
+        return parent::respond(true, "Tasks class", $data);
     }
 }
