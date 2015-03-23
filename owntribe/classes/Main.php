@@ -44,7 +44,12 @@ class Main {
         header('Content-Type: application/json');
         // inject extra data
         $result['_version'] = $this->version;
-        $result['_duration'] = round(microtime(true) - $this->config['start'], 3) . " sec";
+        if($this->config['debug'] === true) {
+            $result['_memory_peak_usage'] = memory_get_peak_usage();
+            $result['_memory_peak_usage_real'] = memory_get_peak_usage(true);
+            $result['_duration'] = round(microtime(true) - $this->config['start'], 3) . " sec";
+        }
+
         echo json_encode($result);
     }
 }
