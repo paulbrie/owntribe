@@ -1,0 +1,60 @@
+{% include 'includes/header.html' %}
+{% include 'includes/menu.html' %}
+<div class="container">
+    <div class="starter-template">
+        <h1>{{h1}}<button type="button" class="btn btn-primary add" style="float:right">New task</button></h1>
+        {% if !logged %}
+        <p class="bg-danger">You are not logged!</p>
+        {% endif %}
+        <div class="panel panel-primary" id="add" style="display: none">
+            <!-- Default panel contents -->
+            <div class="panel-heading">New task</div>
+            <div class="panel-body">
+                <form method="post" action="tasks">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Title</label>
+                        <input type="" class="form-control" id="exampleInputEmail1" placeholder="Enter a task title" name="title">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputPassword1">Description</label>
+                        <input type="text" class="form-control" id="exampleInputPassword1" placeholder="A description (optional)" name="description">
+                    </div>
+                    <button type="submit" class="btn btn-default">Submit</button>
+                </form>
+            </div>
+        </div>
+        <div>
+            {% if addTaskResult %}
+            <div class="alert alert-warning alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                Your task has been added!
+                <script type="text/javascript">
+                    setTimeout("fadeOut()", 1000);
+                    function fadeOut() {
+                        $('div.alert-warning').fadeOut(1000, 'linear', function(){ $('div.alert-warning').remove()});
+                    }
+                </script>
+            </div>
+            {% endif %}
+            {% for task in tasks %}
+            <div class="list-group">
+                <a href="#" class="list-group-item">
+                    <h4 class="list-group-item-heading">#{{task.id}} {{task.name}}</h4>
+                    <p class="list-group-item-text">{{task.description}}</p>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% include 'includes/footer_scripts.html' %}
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('button.add').click(function(){
+            $('#add').toggle();
+            $("#exampleInputEmail1").focus();
+        });
+    });
+</script>
+
+{% include 'includes/footer.html' %}

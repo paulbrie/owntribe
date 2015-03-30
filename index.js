@@ -1,47 +1,58 @@
+'use strict';
+
 // constants
+var ENV         = process.env.NODE_ENV || "development";
 var SERVER      = 'localhost';
 var PROTOCOL    = 'http';
 var PORT        = '8080';
-var BASE_URL    = PROTOCOL + '://' + SERVER + ':' + PORT;
+var BASE_URL    = PROTOCOL + '://' + SERVER;
+if(SERVER && SERVER.length > 0) BASE_URL += ':' + PORT;
 
 // variables
-var express = require('express');
-var mysql   = require('mysql');
+var express     = require('express');
+var session     = require('express-session');
+var mysql       = require('mysql');
+var swig        = require('swig');
+var app         = express();
+var users       = require('./app/middleware/users.js')(app);
+var bodyParser  = require('body-parser')
 
-var app = express();
-app.set('view engine', 'jade');
-app.use(express.static(__dirname + '/public'));
+//app.use( bodyParser.json() );       // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+    extended: true
+}));
 
-/**var connection = mysql.createConnection({
-    host     : 'localhost',
-    database : 'owntribe',
-    user     : 'owntribe',
-    password : 'owntribe'
+app.engine('html', swig.renderFile);
+app.set('views', __dirname + '/views');
+app.set('view engine', 'html');
+
+if (ENV === 'development') {
+    swig.setDefaults({ cache: false });
+}
+
+// localization
+app.use(function(req, res, next) {
+    res.locals._t = function(v) {
+        return v;
+    }
+    next();
 });
 
-connection.connect(); */
+app.use(session({ secret: 'owntribe', cookie: { maxAge: 60000 }, resave: false}));
+app.use(users.init);
+
+var common  = require('./app/controllers/common')(app);
+var tasks   = require('./app/controllers/tasks')(app);
+var api     = require('./app/controllers/api')(app);
 
 // routes
-app.get('/', function(req, res) {
-    res.setHeader('Content-Type', 'text/html');
-    res.render('index', {
-        base_url: BASE_URL,
-        title: 'Owntribe',
-        message: 'Home'});
-});
+app.get('/', common.indexPage);
+app.get('/contribute', common.indexPage);
+app.get('/newsletter', common.indexPage);
+app.get('/tasks', tasks.tasks);
+app.post('/tasks', tasks.tasks);
+app.get('/api', api.index);
 
-app.get('/tasks', function(req, res) {
-    res.setHeader('Content-Type', 'text/html');
-    res.render('index', {
-        base_url: BASE_URL,
-        title: 'Owntribe Tasks',
-        message: 'Tasks'});
-});
-
-
-
-app.get('/api', function(req, res) {
-
-})
+app.use(express.static(__dirname + '/public'));
 
 app.listen(8080);

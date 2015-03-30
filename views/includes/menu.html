@@ -1,0 +1,33 @@
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Owntribe</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+
+                <li {{menu_active_home}}>
+                    <a href="/">{{_t('home')}}</a>
+                </li>
+
+                <li {{menu.active.tasks}}>
+                    <a href="/tasks">tasks</a>
+                </li>
+
+                <li {{menu.active.contribute}}>
+                    <a href="/contribute">contribute</a>
+                </li>
+
+                <li {{menu.active.newsletter}}>
+                    <a href="/newsletter">owntribe</a>
+                </li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>
