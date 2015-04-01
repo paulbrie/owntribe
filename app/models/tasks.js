@@ -1,8 +1,8 @@
-var db = require("./db");
+var db = require("./db").db;
 var tasks = {
     getTasks: function(callback) {
         callback = callback || function(){};
-        db.db.query('SELECT * FROM tasks order by id desc', function(err, rows, fields) {
+        db.query('SELECT * FROM tasks order by id desc', function(err, rows, fields) {
             if (err) throw err;
             console.log(callback);
             callback(rows, fields);
@@ -13,7 +13,14 @@ var tasks = {
             name: title,
             description: description
         };
-        db.db.query('INSERT INTO tasks SET ?', post, function(err, result) {
+        db.query('INSERT INTO tasks SET ?', post, function(err, result) {
+            if(err) console.log(err);
+            if(result.affectedRows == 1) result = true;
+            callback(result);
+        });
+    },
+    setStatus: function(id, status, callback){
+        db.query('UPDATE tasks SET ? WHERE id = ' + parseInt(id), {status: status}, function(err, result) {
             if(err) console.log(err);
             if(result.affectedRows == 1) result = true;
             callback(result);

@@ -1,7 +1,24 @@
 var pipe = require('../libraries/smartpipe');
 var tasks_model = require('../models/tasks');
+/**
+ *
+ * @type {{new: number, done: number}}
+ */
+var task_statuses = {
+    new: 1,
+    done: 2,
+    accepted: 3 // in case it has been give by somebody else
+}
+
+/**
+ * module internal local store
+ * @type {{}}
+ */
 var store = {};
 
+/**
+ * init the local store structure
+ */
 function initStore() {
     store = {
         addTaskErrors: [],
@@ -39,6 +56,13 @@ function addTask(req, res) {
     }
 }
 
+
+function setTaskStatus(status) {
+    tasks_model.setStatus(status, function(result){
+
+    });
+}
+
 /**
  * returns all the available tasks for the current user
  * @param req
@@ -58,7 +82,6 @@ function getTasks(req, res) {
  * @param tasks
  */
 function render(req, res, tasks) {
-    console.log(store);
     res.render('tasks', {
         title: 'Owntribe',
         h1: 'Tasks',

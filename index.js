@@ -51,7 +51,7 @@ app.get('/contribute', common.indexPage);
 app.get('/newsletter', common.indexPage);
 app.get('/tasks', tasks.tasks);
 app.post('/tasks', tasks.tasks);
-app.get('/api', api.index);
+app.get('/api/:resource/:method', api.index);
 
 app.use(express.static(__dirname + '/public'));
 
