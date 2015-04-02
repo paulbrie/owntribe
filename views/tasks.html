@@ -36,10 +36,14 @@
                 </script>
             </div>
             {% endif %}
+            <ul class="nav nav-tabs" style="margin-bottom: 10px">
+                <li role="presentation" class="active"><a href="#">To do</a></li>
+                <li role="presentation"><a href="#">Done</a></li>
+            </ul>
             {% for task in tasks %}
             <div class="list-group">
                 <a href="#" class="list-group-item">
-                    <h4 class="list-group-item-heading">#{{task.id}} {{task.name}}</h4>
+                    <h4 class="list-group-item-heading">#{{task.id}} {{task.name}}<span taskid="{{task.id}}" style="float:right" class="glyphicon glyphicon-ok" aria-hidden="true" onclick="setTaskStatus(this)"/></h4>
                     <p class="list-group-item-text">{{task.description}}</p>
                 </a>
             </div>
@@ -49,11 +53,24 @@
 </div>
 {% include 'includes/footer_scripts.html' %}
 <script type="text/javascript">
-    $(document).ready(function(){
-        $('button.add').click(function(){
+    function setTaskStatus(node) {
+        $.ajax({
+            url: "/api/tasks/set/" + $(node).attr("taskid") + "/done",
+            context: document.body
+        }).done(function (res) {
+            if(res.result) {
+                document.location.href = "/tasks";
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        $('button.add').click(function () {
             $('#add').toggle();
             $("#exampleInputEmail1").focus();
         });
+
+
     });
 </script>
 

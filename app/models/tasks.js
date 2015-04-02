@@ -1,8 +1,11 @@
 var db = require("./db").db;
+var statuses = {};
+statuses.new = 0;
+statuses.done = 1;
 var tasks = {
     getTasks: function(callback) {
         callback = callback || function(){};
-        db.query('SELECT * FROM tasks order by id desc', function(err, rows, fields) {
+        db.query('SELECT * FROM tasks WHERE status = 0 order by id desc', function(err, rows, fields) {
             if (err) throw err;
             console.log(callback);
             callback(rows, fields);
@@ -19,12 +22,18 @@ var tasks = {
             callback(result);
         });
     },
-    setStatus: function(id, status, callback){
-        db.query('UPDATE tasks SET ? WHERE id = ' + parseInt(id), {status: status}, function(err, result) {
-            if(err) console.log(err);
-            if(result.affectedRows == 1) result = true;
-            callback(result);
-        });
+    setStatus: function(callback, params){
+        var id      = params[0] ? parseInt(params[0]) : false;
+        var status  = statuses[params[1]] || false;
+        if(id && status) {
+            db.query('UPDATE tasks SET ? WHERE id = ' + id, {status: status}, function(err, result) {
+                if(err) console.log(err);
+                if(result.affectedRows == 1) result = {result:true};
+                callback(result);
+            });
+        } else {
+            callback({result: false});
+        }
     }
 };
 module.exports = tasks;
