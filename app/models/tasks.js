@@ -3,9 +3,9 @@ var statuses = {};
 statuses.new = 0;
 statuses.done = 1;
 var tasks = {
-    getTasks: function(callback) {
+    getTasks: function(userid, callback) {
         callback = callback || function(){};
-        db.query('SELECT * FROM tasks WHERE status = 0 order by id desc', function(err, rows, fields) {
+        db.query('SELECT * FROM tasks WHERE status = 0 and userid = ' + userid + ' order by id desc', function(err, rows, fields) {
             if (err) throw err;
             console.log(callback);
             callback(rows, fields);

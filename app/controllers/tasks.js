@@ -69,7 +69,7 @@ function setTaskStatus(status) {
  * @param res
  */
 function getTasks(req, res) {
-    tasks_model.getTasks(function(tasks){
+    tasks_model.getTasks(req.session.user.id, function(tasks){
         store.tasks = tasks;
         pipe.next(req, res);
     });
