@@ -11,10 +11,11 @@ var tasks = {
             callback(rows, fields);
         });
     },
-    add: function(title, description, callback) {
+    add: function(userid, title, description,  callback) {
         var post  = {
             name: title,
-            description: description
+            description: description,
+            userid: userid
         };
         db.query('INSERT INTO tasks SET ?', post, function(err, result) {
             if(err) console.log(err);
@@ -22,9 +23,9 @@ var tasks = {
             callback(result);
         });
     },
-    setStatus: function(callback, params){
-        var id      = params[0] ? parseInt(params[0]) : false;
-        var status  = statuses[params[1]] || false;
+    setStatus: function(callback, obj){
+        var id      = obj.params[0] ? parseInt(obj.params[0]) : false;
+        var status  = statuses[obj.params[1]] || false;
         if(id && status) {
             db.query('UPDATE tasks SET ? WHERE id = ' + id, {status: status}, function(err, result) {
                 if(err) console.log(err);

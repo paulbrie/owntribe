@@ -1,4 +1,4 @@
-CREATE TABLE `tasks` (
+CREATE TABLE IF NOT EXISTS `tasks` (
 `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL DEFAULT '1',
   `description` varchar(255) DEFAULT NULL,

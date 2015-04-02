@@ -47,7 +47,7 @@ function addTask(req, res) {
     }
 
     if(store.addTaskErrors.length == 0) {
-        tasks_model.add(req.body.title, req.body.description, function(result){
+        tasks_model.add(req.session.user.id, req.body.title, req.body.description, function(result){
             store.addTaskResult = result ? result : false;
             pipe.next(req, res);
         });
@@ -87,7 +87,8 @@ function render(req, res, tasks) {
         h1: 'Tasks',
         menu_active_home: ' class="active" ',
         tasks: store.tasks,
-        addTaskResult: store.addTaskResult
+        addTaskResult: store.addTaskResult,
+        logged: req.session.user.logged
     });
 }
 
@@ -99,11 +100,17 @@ function render(req, res, tasks) {
 module.exports = function(app) {
     return {
         tasks: function(req, res) {
+            //console.log(req.params);
             initStore();
-            // if method is POST we have a task to add
-            if(req.method === 'POST') pipe.add(addTask);
-            pipe.add(getTasks, render);
-            pipe.next(req, res);
+
+            if(!req.session.user.logged) {
+                res.redirect('/login');
+            } else {
+                // if method is POST we have a task to add
+                if(req.method === 'POST') pipe.add(addTask);
+                pipe.add(getTasks, render);
+                pipe.next(req, res);
+            }
         }
     };
 };

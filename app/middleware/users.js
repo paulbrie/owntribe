@@ -2,15 +2,14 @@ module.exports = function(app) {
     return {
         logged: false,
         init: function(req, res, next) {
-            var sess = req.session;
+            req.session;
             // initialize the session
-            if (!sess.user) {
-                sess.user = {
+            if (!req.session.user) {
+                req.session.user = {
                     logged: false
                 }
             } else {
-                console.log("session already initialized");
-                this.logged = true;
+                console.log(req.session);
             }
             res.locals.users = this;
             next();

@@ -13,15 +13,22 @@ var dictionary = {
         method: 'setStatus',
         params: ['param1', 'param2'],
         authenticated: true
+    },
+    // ----- USERS -----
+    users_login: {
+        model: 'users',
+        method: 'login',
+        params: ['param1', 'param2'],
+        passReq: true,
+        authenticated: true
     }
-
 };
 
 function loadResource(req, callback) {
     var resource    = req.params.resource;
     var method      = req.params.method;
     var endpoint    = dictionary[resource + "_" + method];
-    var paramArray  = [];
+    var paramsObj   = {params:[]};
     // if this endpoint is defined in the dictionary
     if(endpoint) {
         // load the model
@@ -30,11 +37,13 @@ function loadResource(req, callback) {
         if(endpoint.params) {
             for(var index in endpoint.params) {
                 console.log(endpoint.params[index]);
-                paramArray.push(req.params[endpoint.params[index]]);
+                paramsObj.params.push(req.params[endpoint.params[index]]);
             }
+            if(endpoint.passReq) paramsObj.req = req;
         }
+        console.log("---->", paramsObj);
         // invoke the endpoint
-        model[dictionary[resource + "_" + method].method](callback, paramArray);
+        model[dictionary[resource + "_" + method].method](callback, paramsObj, req);
     } else {
         callback({result: false, msg: 'resource not found'});
     }

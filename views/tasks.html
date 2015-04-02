@@ -2,10 +2,7 @@
 {% include 'includes/menu.html' %}
 <div class="container">
     <div class="starter-template">
-        <h1>{{h1}}<button type="button" class="btn btn-primary add" style="float:right">New task</button></h1>
-        {% if !logged %}
-        <p class="bg-danger">You are not logged!</p>
-        {% endif %}
+        <h1>{{h1}}<button id="new" type="button" class="btn btn-primary add" style="float:right">New task</button></h1>
         <div class="panel panel-primary" id="add" style="display: none">
             <!-- Default panel contents -->
             <div class="panel-heading">New task</div>
@@ -42,8 +39,12 @@
             </ul>
             {% for task in tasks %}
             <div class="list-group">
-                <a href="#" class="list-group-item">
-                    <h4 class="list-group-item-heading">#{{task.id}} {{task.name}}<span taskid="{{task.id}}" style="float:right" class="glyphicon glyphicon-ok" aria-hidden="true" onclick="setTaskStatus(this)"/></h4>
+                <a href="#" class="list-group-item" style="height:57px">
+                    <button taskid="{{task.id}}" style="float:right" type="button" class="btn btn-primary add"
+                            onclick="setTaskStatus(this)">Done!</button>
+                    <h4 class="list-group-item-heading">#{{task.id}} {{task.name}}
+
+                    </h4>
                     <p class="list-group-item-text">{{task.description}}</p>
                 </a>
             </div>
@@ -65,12 +66,10 @@
     }
 
     $(document).ready(function() {
-        $('button.add').click(function () {
+        $('#new').click(function () {
             $('#add').toggle();
             $("#exampleInputEmail1").focus();
         });
-
-
     });
 </script>
 

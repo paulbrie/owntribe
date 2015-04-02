@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS `users` (
+`id` int(11) NOT NULL AUTO_INCREMENT,
+  `email` varchar(255) NOT NULL DEFAULT '',
+  `password` varchar(255) NOT NULL DEFAULT '',
+  `type` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

@@ -38,16 +38,24 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.use(session({ secret: 'owntribe', cookie: { maxAge: 60000 }, resave: false}));
+app.use(session({
+    secret: 'owntribe',
+    cookie: {
+        maxAge: 3600000000
+    },
+    resave: false
+}));
 app.use(users.init);
 
 var common  = require('./app/controllers/common')(app);
 var tasks   = require('./app/controllers/tasks')(app);
 var api     = require('./app/controllers/api')(app);
+var login   = require('./app/controllers/login')(app);
 
 // routes
 app.get('/', common.indexPage);
 app.get('/contribute', common.indexPage);
+app.get('/login', login.index);
 app.get('/newsletter', common.indexPage);
 app.get('/tasks', tasks.tasks);
 app.post('/tasks', tasks.tasks);

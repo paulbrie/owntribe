@@ -12,21 +12,30 @@
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
 
-                <li {{menu_active_home}}>
+                <li>
                     <a href="/">{{_t('home')}}</a>
                 </li>
 
-                <li {{menu.active.tasks}}>
+                <li>
                     <a href="/tasks">tasks</a>
                 </li>
-
+                <!--
                 <li {{menu.active.contribute}}>
                     <a href="/contribute">contribute</a>
                 </li>
 
                 <li {{menu.active.newsletter}}>
                     <a href="/newsletter">owntribe</a>
+                </li>-->
+                {% if logged %}
+                <li>
+                    <a href="/login">logout</a>
                 </li>
+                {% else  %}
+                <li>
+                    <a href="/login">login</a>
+                </li>
+                {% endif %}
             </ul>
         </div><!--/.nav-collapse -->
     </div>

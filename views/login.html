@@ -1,0 +1,44 @@
+{% include 'includes/header.html' %}
+{% include 'includes/menu.html' %}
+<div class="container">
+    <h1>{{h1}}</h1>
+    <div class="alert alert-warning" role="alert" style="display:none">
+        Login failed, please try again!
+    </div>
+    <form method="post" action="" onsubmit="return false;">
+        <div class="form-group">
+            <label for="email">Title</label>
+            <input type="" class="form-control" id="email" placeholder="login or email" name="title" />
+        </div>
+        <div class="form-group">
+            <label for="password">Description</label>
+            <input type="password" class="form-control" id="password" placeholder="password" name="description" />
+        </div>
+        <button id="login" class="btn btn-default" onclick="doLogin()">Submit</button>
+    </form>
+{% include 'includes/footer_scripts.html' %}
+<script type="text/javascript">
+    function doLogin() {
+        $.ajax({
+            url: "/api/users/login/" + $("#email").val() + "/" + $("#password").val(),
+            context: document.body
+        }).done(function (res) {
+            if(res.result) {
+                document.location.href = "/tasks";
+            } else {
+                $('div.alert-warning').show();
+                setTimeout("fadeOut()", 1000);
+            }
+        });
+    }
+    function fadeOut() {
+        $('div.alert-warning').fadeOut(1000, 'linear', function(){ $('div.alert-warning').hide()});
+    }
+
+
+
+
+</script>
+</script>
+
+{% include 'includes/footer.html' %}

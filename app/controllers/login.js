@@ -1,0 +1,33 @@
+/**
+ * renders the tasks page
+ * @param req
+ * @param res
+ * @param tasks
+ */
+function render(req, res) {
+    res.render('login', {
+        title: 'Owntribe',
+        h1: 'Login',
+        logged: req.session.user.logged
+    });
+}
+
+/**
+ * returns the public methods of the controller
+ * @param app
+ * @returns {{tasks: Function}}
+ */
+module.exports = function(app) {
+    return {
+        index: function(req, res) {
+            if(req.session.user.logged) {
+                req.session.user = {
+                    logged: false
+                }
+                res.redirect('/login');
+            } else {
+                render(req, res);
+            }
+        }
+    };
+};
