@@ -15,7 +15,7 @@ var mysql       = require('mysql');
 var swig        = require('swig');
 var app         = express();
 var users       = require('./app/middleware/users.js')(app);
-var bodyParser  = require('body-parser')
+var bodyParser  = require('body-parser');
 
 //app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
