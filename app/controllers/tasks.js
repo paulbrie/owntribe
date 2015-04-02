@@ -88,7 +88,8 @@ function render(req, res, tasks) {
         menu_active_home: ' class="active" ',
         tasks: store.tasks,
         addTaskResult: store.addTaskResult,
-        logged: req.session.user.logged
+        logged: req.session.user.logged,
+        tasks_number: store.tasks.length
     });
 }
 

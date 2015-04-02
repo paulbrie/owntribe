@@ -34,7 +34,7 @@
             </div>
             {% endif %}
             <ul class="nav nav-tabs" style="margin-bottom: 10px">
-                <li role="presentation" class="active"><a href="#">To do</a></li>
+                <li role="presentation" class="active"><a href="#">To do <span class="badge">{{tasks_number}}</span></a></li>
                 <li role="presentation"><a href="#">Done</a></li>
             </ul>
             {% for task in tasks %}

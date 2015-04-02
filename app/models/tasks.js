@@ -5,6 +5,7 @@ statuses.done = 1;
 var tasks = {
     getTasks: function(userid, callback) {
         callback = callback || function(){};
+        console.log(userid);
         db.query('SELECT * FROM tasks WHERE status = 0 and userid = ' + userid + ' order by id desc', function(err, rows, fields) {
             if (err) throw err;
             console.log(callback);
