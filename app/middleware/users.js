@@ -9,15 +9,13 @@ module.exports = function(app) {
                     logged: false
                 }
             } else {
-                console.log(req.session);
+                //console.log(req.session);
             }
             res.locals.users = this;
             next();
         },
         isLogged: function() {
             return this.isLogged;
-        },
-        fname: "Paul",
-        lname: "Brie"
+        }
     }
 }

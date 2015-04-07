@@ -5,24 +5,31 @@ statuses.done = 1;
 var tasks = {
     getTasks: function(userid, callback) {
         callback = callback || function(){};
-        console.log(userid);
         db.query('SELECT * FROM tasks WHERE status = 0 and userid = ' + userid + ' order by id desc', function(err, rows, fields) {
             if (err) throw err;
-            console.log(callback);
             callback(rows, fields);
         });
     },
     add: function(userid, title, description,  callback) {
-        var post  = {
-            name: title,
-            description: description,
-            userid: userid
-        };
-        db.query('INSERT INTO tasks SET ?', post, function(err, result) {
-            if(err) console.log(err);
-            if(result.affectedRows == 1) result = true;
-            callback(result);
-        });
+
+        if(title.length > 0) {
+            var post  = {
+                name: title,
+                description: description,
+                userid: userid
+            };
+            db.query('INSERT INTO tasks SET ?', post, function(err, result) {
+                if(err) console.log(err);
+                console.log(result);
+                if(result.affectedRows == 1) result = true;
+                callback(result);
+            });
+        } else {
+            callback({result:false, msg: "task title cannot be empty"});
+        }
+
+
+
     },
     setStatus: function(callback, obj){
         var id      = obj.params[0] ? parseInt(obj.params[0]) : false;

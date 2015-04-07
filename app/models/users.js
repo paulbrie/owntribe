@@ -10,7 +10,6 @@ var users = {
             callback = callback || function(){};
             db.query('SELECT * FROM users WHERE email = ? and password = ?', [email, passw], function(err, rows, fields) {
                 if (!err && rows.length == 1) {
-                    console.log(rows);
                     req.session.user.logged = true;
                     req.session.user.email = rows[0].email;
                     req.session.user.id = rows[0].id;

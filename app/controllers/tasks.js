@@ -1,36 +1,5 @@
-var pipe = require('../libraries/smartpipe');
+var pipe        = require('../libraries/smartpipe');
 var tasks_model = require('../models/tasks');
-/**
- *
- * @type {{new: number, done: number}}
- */
-var task_statuses = {
-    new: 1,
-    done: 2,
-    accepted: 3 // in case it has been give by somebody else
-}
-
-/**
- * module internal local store
- * @type {{}}
- */
-var store = {};
-
-/**
- * init the local store structure
- */
-function initStore() {
-    store = {
-        addTaskErrors: [],
-        tasks: null,
-        addTaskResult: false
-    };
-}
-
-var errorMessages = {
-    "title_empty": "the title cannot be empty",
-    "description_empty": "description cannot be empty"
-}
 
 /**
  * adds a task for the current user
@@ -38,24 +7,19 @@ var errorMessages = {
  * @param res
  */
 function addTask(req, res) {
-    if(req.body.title && req.body.title.length == 0) {
-        store.addTaskErrors.push(errorMessages.title_empty);
-    }
-
-    if(req.body.description && req.body.description.length == 0) {
-        store.addTaskErrors.push(errorMessages.description_empty);
-    }
-
-    if(store.addTaskErrors.length == 0) {
+    req._store.addTaskResult = false;
+    req._store.addTaskErrorMsg = "";
+    if(req.body.title.length != 0) {
         tasks_model.add(req.session.user.id, req.body.title, req.body.description, function(result){
-            store.addTaskResult = result ? result : false;
+            req._store.addTaskResult = result;
+            req._store.addTaskErrorMsg = "Sorry, something went wrong.";
             pipe.next(req, res);
         });
     } else {
+        req._store.addTaskErrorMsg = "The title can't be empty.";
         pipe.next(req, res);
     }
 }
-
 
 function setTaskStatus(status) {
     tasks_model.setStatus(status, function(result){
@@ -70,7 +34,7 @@ function setTaskStatus(status) {
  */
 function getTasks(req, res) {
     tasks_model.getTasks(req.session.user.id, function(tasks){
-        store.tasks = tasks;
+        req._store.tasks = tasks;
         pipe.next(req, res);
     });
 }
@@ -86,10 +50,11 @@ function render(req, res, tasks) {
         title: 'Owntribe',
         h1: 'Tasks',
         menu_active_home: ' class="active" ',
-        tasks: store.tasks,
-        addTaskResult: store.addTaskResult,
+        tasks: req._store.tasks,
+        addTaskResult: req._store.addTaskResult,
+        addTaskErrorMsg: req._store.addTaskErrorMsg,
         logged: req.session.user.logged,
-        tasks_number: store.tasks.length
+        tasks_number: req._store.tasks.length
     });
 }
 
@@ -101,9 +66,6 @@ function render(req, res, tasks) {
 module.exports = function(app) {
     return {
         tasks: function(req, res) {
-            //console.log(req.params);
-            initStore();
-
             if(!req.session.user.logged) {
                 res.redirect('/login');
             } else {

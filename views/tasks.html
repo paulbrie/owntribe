@@ -3,14 +3,21 @@
 <div class="container">
     <div class="starter-template">
         <h1>{{h1}}<button id="new" type="button" class="btn btn-primary add" style="float:right">New task</button></h1>
-        <div class="panel panel-primary" id="add" style="display: none">
-            <!-- Default panel contents -->
+        {% if addTaskResult %}
+        <div class="panel panel-primary" id="add" style="display:none">
+        {% else %}
+        <div class="panel panel-primary" id="add" style="display:block">
+        {% endif %}
             <div class="panel-heading">New task</div>
             <div class="panel-body">
                 <form method="post" action="tasks">
+                    {% if addTaskResult %}
+                    <div class="form-group has-error">
+                    {% else %}
                     <div class="form-group">
+                    {% endif %}
                         <label for="exampleInputEmail1">Title</label>
-                        <input type="" class="form-control" id="exampleInputEmail1" placeholder="Enter a task title" name="title">
+                        <input type="text" class="form-control" id="exampleInputEmail1" placeholder="Enter a task title" name="title">
                     </div>
                     <div class="form-group">
                         <label for="exampleInputPassword1">Description</label>
@@ -21,18 +28,6 @@
             </div>
         </div>
         <div>
-            {% if addTaskResult %}
-            <div class="alert alert-warning alert-dismissible" role="alert">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                Your task has been added!
-                <script type="text/javascript">
-                    setTimeout("fadeOut()", 1000);
-                    function fadeOut() {
-                        $('div.alert-warning').fadeOut(1000, 'linear', function(){ $('div.alert-warning').remove()});
-                    }
-                </script>
-            </div>
-            {% endif %}
             <ul class="nav nav-tabs" style="margin-bottom: 10px">
                 <li role="presentation" class="active"><a href="#">To do <span class="badge">{{tasks_number}}</span></a></li>
                 <li role="presentation"><a href="#">Done</a></li>

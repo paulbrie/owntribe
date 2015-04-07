@@ -15,13 +15,15 @@ var mysql       = require('mysql');
 var swig        = require('swig');
 var app         = express();
 var users       = require('./app/middleware/users.js')(app);
-var bodyParser  = require('body-parser')
+var bodyParser  = require('body-parser');
+var config      = require('./config/environments/' + ENV);
 
 //app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
 }));
 
+app.set('config', config);
 app.engine('html', swig.renderFile);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'html');
@@ -32,6 +34,7 @@ if (ENV === 'development') {
 
 // localization
 app.use(function(req, res, next) {
+    req._store = {};
     res.locals._t = function(v) {
         return v;
     }
@@ -45,24 +48,18 @@ app.use(session({
     },
     resave: false
 }));
+
 app.use(users.init);
 
-var common  = require('./app/controllers/common')(app);
-var tasks   = require('./app/controllers/tasks')(app);
-var api     = require('./app/controllers/api')(app);
-var login   = require('./app/controllers/login')(app);
-
 // routes
-app.get('/', common.indexPage);
-app.get('/contribute', common.indexPage);
-app.get('/login', login.index);
-app.get('/newsletter', common.indexPage);
-app.get('/tasks', tasks.tasks);
-app.post('/tasks', tasks.tasks);
-app.get('/api/:resource/:method/:param1/:param2', api.index);
-app.get('/api/:resource/:method/:param1', api.index);
-app.get('/api/:resource/:method', api.index);
+['common', 'api'].forEach(function(route){
+    require('./app/routes/' + route + '_routes')(app);
+});
 
+
+
+// static
 app.use(express.static(__dirname + '/public'));
 
+// Go!
 app.listen(8080);

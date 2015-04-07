@@ -36,12 +36,11 @@ function loadResource(req, callback) {
         // if we have parameters, inject them
         if(endpoint.params) {
             for(var index in endpoint.params) {
-                console.log(endpoint.params[index]);
+                //console.log(endpoint.params[index]);
                 paramsObj.params.push(req.params[endpoint.params[index]]);
             }
             if(endpoint.passReq) paramsObj.req = req;
         }
-        console.log("---->", paramsObj);
         // invoke the endpoint
         model[dictionary[resource + "_" + method].method](callback, paramsObj, req);
     } else {
