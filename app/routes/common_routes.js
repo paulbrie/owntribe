@@ -9,5 +9,6 @@ module.exports = function(app) {
     app.get('/login', login.index);
     app.get('/newsletter', common.indexPage);
     app.get('/tasks', tasks.tasks);
+    app.get('/tasks/done', tasks.done);
     app.post('/tasks', tasks.tasks);
 };

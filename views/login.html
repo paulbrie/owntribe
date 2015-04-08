@@ -16,11 +16,14 @@
         </div>
         <button id="login" class="btn btn-default" onclick="doLogin()">Submit</button>
     </form>
+</div>
 {% include 'includes/footer_scripts.html' %}
 <script type="text/javascript">
+
     $(document).ready(function(){
         $('#email').focus();
     });
+
     function doLogin() {
         $.ajax({
             url: "/api/users/login/" + $("#email").val() + "/" + $("#password").val(),
@@ -34,14 +37,10 @@
             }
         });
     }
+
     function fadeOut() {
         $('div.alert-warning').fadeOut(1000, 'linear', function(){ $('div.alert-warning').hide()});
     }
-
-
-
-
-</script>
 </script>
 
 {% include 'includes/footer.html' %}

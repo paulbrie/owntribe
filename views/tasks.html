@@ -28,16 +28,19 @@
             </div>
         </div>
         <div>
-            <ul class="nav nav-tabs" style="margin-bottom: 10px">
-                <li role="presentation" class="active"><a href="#">To do <span class="badge">{{tasks_number}}</span></a></li>
-                <li role="presentation"><a href="#">Done</a></li>
-            </ul>
-            {% for task in tasks %}
-            <div class="list-group">
-                <a href="#" class="list-group-item" style="height:57px">
-                    <button taskid="{{task.id}}" style="float:right" type="button" class="btn btn-primary add"
-                            onclick="setTaskStatus(this)">Done!</button>
-                    <h4 class="list-group-item-heading">#{{task.id}} {{task.name}}
+            {% if addTaskResult %}
+            <div class="alert alert-warning alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                Your task has been added!
+                <script type="text/javascript">
+                    setTimeout("fadeOut()", 1000);
+                    function fadeOut() {
+                        $('div.alert-warning').fadeOut(1000, 'linear', function(){ $('div.alert-warning').remove()});
+                    }
+                </script>
+            </div>
+            {% endif %}
+
             <div role="tabpanel">
 
                 <!-- Nav tabs -->

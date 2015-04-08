@@ -1,9 +1,12 @@
 var pipe = require('../libraries/smartpipe');
 
 function login(req, res) {
+    console.log('login');
     var users_model = require('../models/users');
-    console.log(req);
-    pipe.next(req, res);
+    users_model.login(function(result){
+        pipe.next(req, res);
+    },{params:[req.params.email, req.params.password]}, req)
+
 }
 
 /**

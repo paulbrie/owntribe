@@ -1,8 +1,7 @@
+<p style="text-align:right"><a href="#" >Delete history of done tasks</a></p>
 {% for task in tasks %}
 <div class="list-group">
     <a href="#" class="list-group-item" style="height:57px">
-        <button taskid="{{task.id}}" style="float:right" type="button" class="btn btn-primary add"
-                onclick="setTaskStatus(this)">Done!</button>
         <h4 class="list-group-item-heading">#{{task.id}} {{task.name}}
 
         </h4>

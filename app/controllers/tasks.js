@@ -47,7 +47,7 @@ function getTasks(req, res) {
 function getDone(req, res) {
     tasks_model.getDone(req.session.user.id, function(tasks){
         //console.log('getDone: tasks', tasks);
-        store.tasks_done = tasks;
+        req._store.tasks_done = tasks;
         pipe.next(req, res);
     });
 }
@@ -73,8 +73,8 @@ function render(req, res, tasks) {
 
 function render_done(req, res, tasks) {
     res.render('tasks/done', {
-        tasks: store.tasks_done,
-        count: store.tasks_done.length
+        tasks: req._store.tasks_done,
+        count: req._store.tasks_done.length
     });
 }
 
@@ -96,9 +96,6 @@ module.exports = function(app) {
             }
         },
         done: function(req, res) {
-            //console.log(req.params);
-            initStore();
-
             if(!req.session.user.logged) {
                 res.redirect('/login');
             } else {
