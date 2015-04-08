@@ -2,7 +2,7 @@
 {% include 'includes/menu.html' %}
 <div class="container">
     <div class="starter-template">
-        <h1>{{h1}}<button id="new" type="button" class="btn btn-primary add" style="float:right">New task</button></h1>
+        <h1>{{h1}}<button id="new" type="button" class="btn btn-primary add" style="float:right">New task ( N )</button></h1>
         {% if addTaskResult %}
         <div class="panel panel-primary" id="add" style="display:none">
         {% else %}
@@ -16,12 +16,12 @@
                     {% else %}
                     <div class="form-group">
                     {% endif %}
-                        <label for="exampleInputEmail1">Title</label>
-                        <input type="text" class="form-control" id="exampleInputEmail1" placeholder="Enter a task title" name="title">
+                        <label for="title">Title</label>
+                        <input type="text" class="form-control" id="title" placeholder="Enter a task title" name="title">
                     </div>
                     <div class="form-group">
-                        <label for="exampleInputPassword1">Description</label>
-                        <input type="text" class="form-control" id="exampleInputPassword1" placeholder="A description (optional)" name="description">
+                        <label for="description">Description</label>
+                        <input type="text" class="form-control" id="description" placeholder="A description (optional)" name="description">
                     </div>
                     <button type="submit" class="btn btn-default">Submit</button>
                 </form>
@@ -73,6 +73,11 @@
 </div>
 {% include 'includes/footer_scripts.html' %}
 <script type="text/javascript">
+
+    // defines if hiting the key N should toggle the add task form
+    var keyToggle = true;
+
+
     function setTaskStatus(node) {
         $.ajax({
             url: "/api/tasks/set/" + $(node).attr("taskid") + "/done",
@@ -87,7 +92,26 @@
     $(document).ready(function() {
         $('#new').click(function () {
             $('#add').toggle();
-            $("#exampleInputEmail1").focus();
+            $("#title").click();
+        });
+
+        $("#title, #description").focusin(function(){
+            keyToggle = false;
+        });
+
+        $("#title, #description").focusout(function(){
+            keyToggle = true;
+        });
+
+        $(window).keydown(function(event) {
+            if(event.keyCode  == 78) {
+                if(keyToggle) {
+                    $('#add').toggle(null, function(){
+                        $('#add').focus();
+                        $("#title").click();
+                    });
+                }
+            }
         });
 
         $('[data-toggle="tabajax"]').click(function(e) {

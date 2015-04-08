@@ -13,11 +13,11 @@
             <ul class="nav navbar-nav">
 
                 <li>
-                    <a href="/">{{_t('home')}}</a>
+                    <a href="/">{{_t('home')|capitalize}}</a>
                 </li>
 
                 <li>
-                    <a href="/tasks">tasks</a>
+                    <a href="/tasks">{{_t('tasks')|capitalize}}</a>
                 </li>
                 <!--
                 <li {{menu.active.contribute}}>
@@ -29,11 +29,11 @@
                 </li>-->
                 {% if logged %}
                 <li>
-                    <a href="/login">logout</a>
+                    <a href="/login">{{_t('logout')|capitalize}}</a>
                 </li>
                 {% else  %}
                 <li>
-                    <a href="/login">login</a>
+                    <a href="/login">{{_t('login')|capitalize}}</a>
                 </li>
                 {% endif %}
             </ul>

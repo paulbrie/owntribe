@@ -5,8 +5,9 @@ function login(req, res) {
     var users_model = require('../models/users');
     users_model.login(function(result){
         pipe.next(req, res);
-    },{params:[req.params.email, req.params.password]}, req)
-
+    },{
+        params:[req.params.email, req.params.password]
+    }, req);
 }
 
 /**
