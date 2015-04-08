@@ -52,6 +52,12 @@ function loadResource(req, callback) {
             // invoke the endpoint
             model[dictionary[resource + "_" + method].method](callback, paramsObj, req);
         }
+<<<<<<< HEAD
+=======
+        //console.log("---->", paramsObj);
+        // invoke the endpoint
+        model[dictionary[resource + "_" + method].method](callback, paramsObj, req);
+>>>>>>> 8cd8db08368a4ebe22f87333cdcfd5254757291b
     } else {
         callback({result: false, msg: 'resource not found'});
     }

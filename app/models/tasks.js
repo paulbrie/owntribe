@@ -15,6 +15,15 @@ var tasks = {
             callback(rows, fields);
         });
     },
+    getDone: function(userid, callback) {
+        callback = callback || function(){};
+        //console.log(userid);
+        db.query('SELECT * FROM tasks WHERE status = 1 and userid = ' + userid + ' order by id desc', function(err, rows, fields) {
+            if (err) throw err;
+            //console.log('getDone', rows);
+            callback(rows, fields);
+        });
+    },
     add: function(userid, title, description,  callback) {
 
         if(title.length > 0) {

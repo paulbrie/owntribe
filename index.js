@@ -56,10 +56,10 @@ app.use(users.init);
     require('./app/routes/' + route + '_routes')(app);
 });
 
-
-
 // static
 app.use(express.static(__dirname + '/public'));
 
 // Go!
-app.listen(8080);
+app.listen(PORT, function (){
+    console.log("Server started on " + BASE_URL);
+});
