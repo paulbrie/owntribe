@@ -10,11 +10,11 @@ function addTask(req, res) {
     req._store.addTaskResult = false;
     req._store.addTaskErrorMsg = "";
     if(req.body.title.length != 0) {
-        tasks_model.add(req.session.user.id, req.body.title, req.body.description, function(result){
+        tasks_model.add(function(result){
             req._store.addTaskResult = result;
             req._store.addTaskErrorMsg = "Sorry, something went wrong.";
             pipe.next(req, res);
-        });
+        }, {params:[req.body.title, req.body.description, req.body.private]}, req);
     } else {
         req._store.addTaskErrorMsg = "The title can't be empty.";
         pipe.next(req, res);
@@ -46,7 +46,6 @@ function getTasks(req, res) {
  */
 function getDone(req, res) {
     tasks_model.getDone(req.session.user.id, function(tasks){
-        //console.log('getDone: tasks', tasks);
         req._store.tasks_done = tasks;
         pipe.next(req, res);
     });
