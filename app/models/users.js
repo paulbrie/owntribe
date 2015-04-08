@@ -20,7 +20,7 @@ var users = {
                     req.session.user.logged = true;
                     req.session.user.email = rows[0].email;
                     req.session.user.id = rows[0].id;
-                    console.log(req.session);
+                    //console.log(req.session);
                     callback({result: true});
                 } else {
                     callback({result: false, msg: "login failed"});
