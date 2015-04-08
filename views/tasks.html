@@ -33,22 +33,34 @@
                 </script>
             </div>
             {% endif %}
-            <ul class="nav nav-tabs" style="margin-bottom: 10px">
-                <li role="presentation" class="active"><a href="#">To do <span class="badge">{{tasks_number}}</span></a></li>
-                <li role="presentation"><a href="#">Done</a></li>
-            </ul>
-            {% for task in tasks %}
-            <div class="list-group">
-                <a href="#" class="list-group-item" style="height:57px">
-                    <button taskid="{{task.id}}" style="float:right" type="button" class="btn btn-primary add"
-                            onclick="setTaskStatus(this)">Done!</button>
-                    <h4 class="list-group-item-heading">#{{task.id}} {{task.name}}
 
-                    </h4>
-                    <p class="list-group-item-text">{{task.description}}</p>
-                </a>
+            <div role="tabpanel">
+
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" style="margin-bottom: 10px" role="tablist">
+                    <li role="presentation" class="active"><a href="#todo-list" aria-controls="todo-list" role="tab" data-toggle="tab">To do <span class="badge">{{tasks_number}}</span></a></li>
+                    <li role="presentation"><a href="/tasks/done" aria-controls="done-list" role="tab" data-toggle="tabajax" data-target="#done-list">Done <span class="badge">{{done_number}}</span></a></li>
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="todo-list">
+                        {% for task in tasks %}
+                        <div class="list-group">
+                            <a href="#" class="list-group-item" style="height:57px">
+                                <button taskid="{{task.id}}" style="float:right" type="button" class="btn btn-primary add"
+                                        onclick="setTaskStatus(this)">Done!</button>
+                                <h4 class="list-group-item-heading">#{{task.id}} {{task.name}}
+
+                                </h4>
+                                <p class="list-group-item-text">{{task.description}}</p>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="done-list"></div>
+                </div>
             </div>
-            {% endfor %}
         </div>
     </div>
 </div>
@@ -69,6 +81,17 @@
         $('#new').click(function () {
             $('#add').toggle();
             $("#exampleInputEmail1").focus();
+        });
+
+        $('[data-toggle="tabajax"]').click(function(e) {
+            var $this = $(this),
+                loadurl = $this.attr('href'),
+                targ = $this.attr('data-target');
+            $.get(loadurl, function(data) {
+                $(targ).html(data);
+            });
+            $this.tab('show');
+            return false;
         });
     });
 </script>

@@ -58,6 +58,7 @@ app.get('/contribute', common.indexPage);
 app.get('/login', login.index);
 app.get('/newsletter', common.indexPage);
 app.get('/tasks', tasks.tasks);
+app.get('/tasks/done', tasks.done);
 app.post('/tasks', tasks.tasks);
 app.get('/api/:resource/:method/:param1/:param2', api.index);
 app.get('/api/:resource/:method/:param1', api.index);
@@ -65,4 +66,6 @@ app.get('/api/:resource/:method', api.index);
 
 app.use(express.static(__dirname + '/public'));
 
-app.listen(8080);
+app.listen(PORT, function (){
+    console.log("Server started on " + BASE_URL);
+});

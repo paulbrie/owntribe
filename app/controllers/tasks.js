@@ -76,6 +76,19 @@ function getTasks(req, res) {
 }
 
 /**
+ * returns all done tasks for the current user
+ * @param req
+ * @param res
+ */
+function getDone(req, res) {
+    tasks_model.getDone(req.session.user.id, function(tasks){
+        //console.log('getDone: tasks', tasks);
+        store.tasks_done = tasks;
+        pipe.next(req, res);
+    });
+}
+
+/**
  * renders the tasks page
  * @param req
  * @param res
@@ -90,6 +103,13 @@ function render(req, res, tasks) {
         addTaskResult: store.addTaskResult,
         logged: req.session.user.logged,
         tasks_number: store.tasks.length
+    });
+}
+
+function render_done(req, res, tasks) {
+    res.render('tasks/done', {
+        tasks: store.tasks_done,
+        count: store.tasks_done.length
     });
 }
 
@@ -110,6 +130,17 @@ module.exports = function(app) {
                 // if method is POST we have a task to add
                 if(req.method === 'POST') pipe.add(addTask);
                 pipe.add(getTasks, render);
+                pipe.next(req, res);
+            }
+        },
+        done: function(req, res) {
+            //console.log(req.params);
+            initStore();
+
+            if(!req.session.user.logged) {
+                res.redirect('/login');
+            } else {
+                pipe.add(getDone, render_done);
                 pipe.next(req, res);
             }
         }

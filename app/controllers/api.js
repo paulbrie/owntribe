@@ -41,7 +41,7 @@ function loadResource(req, callback) {
             }
             if(endpoint.passReq) paramsObj.req = req;
         }
-        console.log("---->", paramsObj);
+        //console.log("---->", paramsObj);
         // invoke the endpoint
         model[dictionary[resource + "_" + method].method](callback, paramsObj, req);
     } else {
