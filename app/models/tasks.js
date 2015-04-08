@@ -3,9 +3,14 @@ var statuses = {};
 statuses.new = 0;
 statuses.done = 1;
 var tasks = {
-    getTasks: function(userid, callback) {
+    getTasks: function(callback, params, req) {
         callback = callback || function(){};
-        db.query('SELECT * FROM tasks WHERE status = 0 and userid = ' + userid + ' order by id desc', function(err, rows, fields) {
+        console.log("req", req);
+        console.log("userid", params.userid);
+        console.log("callback", callback);
+        var sql = 'SELECT * FROM tasks WHERE status = 0 and userid = ' + req.session.user.id + ' order by id desc';
+        console.log(sql);
+        db.query(sql, function(err, rows, fields) {
             if (err) throw err;
             callback(rows, fields);
         });

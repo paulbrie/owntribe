@@ -33,10 +33,10 @@ function setTaskStatus(status) {
  * @param res
  */
 function getTasks(req, res) {
-    tasks_model.getTasks(req.session.user.id, function(tasks){
+    tasks_model.getTasks(function(tasks){
         req._store.tasks = tasks;
         pipe.next(req, res);
-    });
+    }, {userid: req.session.user.id}, req);
 }
 
 /**
@@ -54,7 +54,7 @@ function render(req, res, tasks) {
         addTaskResult: req._store.addTaskResult,
         addTaskErrorMsg: req._store.addTaskErrorMsg,
         logged: req.session.user.logged,
-        tasks_number: req._store.tasks.length
+        tasks_number: req._store.tasks.length || 0
     });
 }
 

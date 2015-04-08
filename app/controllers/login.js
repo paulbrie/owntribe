@@ -1,3 +1,11 @@
+var pipe = require('../libraries/smartpipe');
+
+function login(req, res) {
+    var users_model = require('../models/users');
+    console.log(req);
+    pipe.next(req, res);
+}
+
 /**
  * renders the tasks page
  * @param req
@@ -26,7 +34,9 @@ module.exports = function(app) {
                 }
                 res.redirect('/login');
             } else {
-                render(req, res);
+                var users_model = require('../models/users');
+                pipe.add(login, render);
+                pipe.next(req, res);
             }
         }
     };
