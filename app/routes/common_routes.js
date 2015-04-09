@@ -3,8 +3,10 @@ module.exports = function(app) {
     var common  = require('../controllers/common')(app);
     var tasks   = require('../controllers/tasks')(app);
     var login   = require('../controllers/login')(app);
+    var timeline   = require('../controllers/timeline')(app);
 
     app.get('/', common.indexPage);
+    app.get('/timeline', timeline.indexPage);
     app.get('/contribute', common.indexPage);
     app.get('/login', login.index);
     app.get('/newsletter', common.indexPage);

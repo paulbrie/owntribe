@@ -80,16 +80,19 @@ function render_done(req, res, tasks) {
 /**
  * returns the public methods of the controller
  * @param app
- * @returns {{tasks: Function}}
+ * @returns {{tasks: Function, done: Function}}
  */
 module.exports = function(app) {
     return {
         tasks: function(req, res) {
+            // TODO: @Robert, make it better! :)
+            console.log(pipe.steps);
             if(!req.session.user.logged) {
                 res.redirect('/login');
             } else {
                 // if method is POST we have a task to add
                 if(req.method === 'POST') pipe.add(addTask);
+
                 pipe.add(getTasks, render);
                 pipe.next(req, res);
             }
