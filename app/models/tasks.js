@@ -42,18 +42,22 @@ var tasks = {
             callback({result:false, msg: "task title cannot be empty"});
         }
     },
-    setStatus: function(callback, obj){
-        var id      = obj.params[0] ? parseInt(obj.params[0]) : false;
-        var status  = statuses[obj.params[1]] || false;
-        if(id && status) {
-            db.query('UPDATE tasks SET ? WHERE id = ' + id, {status: status}, function(err, result) {
-                if(err) console.log(err);
-                if(result.affectedRows == 1) result = {result:true};
-                callback(result);
-            });
-        } else {
-            callback({result: false});
+    setStatus: function(callback, params, req){
+        if(params.status === "done") {
+            status = 1;
         }
+        db.query('UPDATE tasks SET ? WHERE id = ' + params.id, {status: status}, function(err, result) {
+            if(err) {
+                console.log(err);
+                callback({result: false, msg: "An model error has occured"});
+            } else {
+                var bool = false;
+                if(result.affectedRows == 1) {
+                    bool = true;
+                }
+                callback({result: result});
+            }
+        });
     }
 };
 module.exports = tasks;

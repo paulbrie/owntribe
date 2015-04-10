@@ -29,7 +29,7 @@ var dictionary = {
                 required: true
             },
             status: {
-                constraint: intval,
+                constraint: 'done',
                 required: true
             }
         },
