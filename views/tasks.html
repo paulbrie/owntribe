@@ -3,11 +3,7 @@
 <div class="container">
     <div class="starter-template">
         <h1>{{h1}}<button id="new" type="button" class="btn btn-primary add" style="float:right">New task ( N )</button></h1>
-        {% if addTaskResult %}
         <div class="panel panel-primary" id="add" style="display:none">
-        {% else %}
-        <div class="panel panel-primary" id="add" style="display:block">
-        {% endif %}
             <div class="panel-heading">New task</div>
             <div class="panel-body">
                 <form method="post" action="tasks">
