@@ -7,16 +7,14 @@ statuses.new = 0;
 statuses.done = 1;
 var tasks = {
     getTasks: function(callback, params, req) {
+        var status = 0;
+        if(params.type && params.type === "done") {
+            status = 1;
+        }
+
         callback = callback || function(){};
-        var sql = 'SELECT * FROM tasks WHERE status = 0 and userid = ' + req.session.user.id + ' order by id desc';
+        var sql = "SELECT * FROM tasks WHERE status = " + status + " and userid = " + req.session.user.id + " order by id desc";
         db.query(sql, function(err, rows, fields) {
-            if (err) throw err;
-            callback(rows, fields);
-        });
-    },
-    getDone: function(userid, callback) {
-        callback = callback || function(){};
-        db.query('SELECT * FROM tasks WHERE status = 1 and userid = ' + userid + ' order by id desc', function(err, rows, fields) {
             if (err) throw err;
             callback(rows, fields);
         });

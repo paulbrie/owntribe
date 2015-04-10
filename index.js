@@ -14,9 +14,10 @@ var session     = require('express-session');
 var mysql       = require('mysql');
 var swig        = require('swig');
 var app         = express();
-var users       = require('./app/middleware/users.js')(app);
+var users       = require('./app/middleware/users')(app);
 var bodyParser  = require('body-parser');
 var config      = require('./config/environments/' + ENV);
+
 
 //app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -38,6 +39,7 @@ app.use(function(req, res, next) {
     res.locals._t = function(v) {
         return v;
     }
+    req.api = require('./app/controllers/api')(app);
     next();
 });
 
@@ -51,8 +53,14 @@ app.use(session({
 
 app.use(users.init);
 
+/**app.use(function(req, res, next){
+
+    next();
+})*/
+
+
 // routes
-['common', 'api'].forEach(function(route){
+['common','api'].forEach(function(route){
     require('./app/routes/' + route + '_routes')(app);
 });
 

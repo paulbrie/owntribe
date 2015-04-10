@@ -1,5 +1,4 @@
 var pipe        = require('../libraries/smartpipe');
-var tasks_model = require('../models/tasks');
 
 /**
  * adds a task for the current user
@@ -33,10 +32,18 @@ function setTaskStatus(status) {
  * @param res
  */
 function getTasks(req, res) {
-    tasks_model.getTasks(function(tasks){
-        req._store.tasks = tasks;
+    req.internalCall = {
+        resource: "tasks",
+        method  : "get"
+    }
+    req.api.loadResource(req, function(result){
+        if(typeof result === "object") {
+            req._store.tasks = result;
+        } else {
+            req._store.tasks = {};
+        }
         pipe.next(req, res);
-    }, {userid: req.session.user.id}, req);
+    });
 }
 
 /**
@@ -45,7 +52,13 @@ function getTasks(req, res) {
  * @param res
  */
 function getDone(req, res) {
-    tasks_model.getDone(req.session.user.id, function(tasks){
+    req.internalCall = {
+        resource: "tasks",
+        method  : "get",
+        param1  : "done"
+    };
+
+    req.api.loadResource(req, function(tasks){
         req._store.tasks_done = tasks;
         pipe.next(req, res);
     });

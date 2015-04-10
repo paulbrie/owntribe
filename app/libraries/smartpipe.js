@@ -62,8 +62,9 @@ var smartpipe = {
             if (this.currentStep < this.stepsNames.length) {
                 var executeStep = this.currentStep;
                 this.currentStep++;
-                var copy = Array.prototype.slice.call(arguments);
-                this.steps[this.stepsNames[executeStep]].fx.apply(null, arguments);
+                var fx = this.steps[this.stepsNames[executeStep]].fx;
+                fx.apply(null, arguments);
+                delete this.steps[this.stepsNames[executeStep]];
             } else {
                 console.log('no more steps, bye!');
             }
