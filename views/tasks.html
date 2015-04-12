@@ -130,13 +130,16 @@
 
         $('[data-toggle="tabajax"]').click(function(e) {
             $.get(urlDone, function(data) {
-                var template = $("#done-list div:first");
-                $.each(data, function(item){
-                    console.log(data[item]);
-                    $("h4", template).text("#" + data[item].id + " " + data[item].name);
-                    $("p", template).text(data[item].description);
-                    $("#done-list").append($(template).html());
-                });
+                if(data.result) {
+                    var rows = data.data;
+                    var template = $("#done-list div:first");
+                    $.each(rows, function(item){
+                        rows[item];
+                        $("h4", template).text("#" + rows[item].id + " " + rows[item].name);
+                        $("p", template).text(rows[item].description);
+                        $("#done-list").append($(template).html());
+                    });
+                }
             });
             $(this).tab('show');
             return false;
