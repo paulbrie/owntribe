@@ -7,6 +7,22 @@ function intval(val) {
  * for example tasks_get maps /api/tasks/get with the model tasks and the method getTasks
  */
 var dictionary = {
+    tasks_add: {
+        expose: true,
+        model: 'tasks',
+        method: 'add',
+        params: {
+            title: {
+                constraint: ".*",
+                required: true
+            },
+            description: {
+                constraint: ".*",
+                required: true
+            }
+        },
+        authenticated: true
+    },
     tasks_get: {
         expose: true,
         model: 'tasks',
@@ -76,13 +92,16 @@ function loadResource(req, callback) {
         var method          = req.internalCall.method;
         var externalParams  = req.internalCall.params || {};
 
-    // else it comes from outside
+    // else it is a http call
     } else {
         var resource        = req.params.resource;
         var method          = req.params.method;
         var externalParams  = req.params || {};
     }
-    var endpoint        = dictionary[resource + "_" + method];
+
+    console.log("--> ", resource + "_" + method);
+
+    var endpoint = dictionary[resource + "_" + method];
     if(!endpoint.expose) {
         callback({result: false, msg: 'This endpoint does not exist.'});
     } else {
@@ -96,52 +115,49 @@ function loadResource(req, callback) {
                 var model = require('../models/' + endpoint.model);
                 // if we have parameters, inject them
                 var check = "";
+                //console.log("endpoint.params", endpoint.params);
                 if(endpoint.params) {
-                    // check if the user must be authenticated
-                    if(endpoint.params.authenticated && !req.session.user.logged) {
+                    var i = 1;
+                    for (var param in endpoint.params) {
 
-                    } else {
-                        var i = 1;
-                        for (var param in endpoint.params) {
-                            // parameter is required but is missing
-                            if(!externalParams["param" + i] && endpoint.params[param].required) {
-                                callback({result: false, msg: "parameter" + param + "is required"});
-                            }
+                        var key = req.internalCall ? param : "param" + i;
+                        console.log("    build parameter " + key);
+                        // parameter is required but is missing
+                        // if(!externalParams["param" + i] && endpoint.params[param].required) {
+                        //    console.log("api.js > parameter " + param + " is required");
+                        //    callback({result: false, msg: "parameter " + param + " is required"});
+                        // }
 
-                            // if the parameter exists, prepare it for the model
-                            if(externalParams["param" + i]) {
-                                // if constraint is of type regex
-                                if(typeof endpoint.params[param].constraint == "string") {
-                                    var regEx = new RegExp(endpoint.params[param].constraint, 'gi');
-                                    if(typeof param.match(regEx) == null) {
-                                        check += "Parameter " + param + " is not accepted. ";
-                                    };
-                                    // else it is a function
-                                } else {
-                                    if(!endpoint.params[param].constraint(externalParams["param" + i])) {
-                                        check += "Parameter " + param + " is not accepted. ";
-                                    }
+                        // if the parameter exists, prepare it for the model
+                        if(externalParams[key]) {
+                            // if constraint is of type regex
+                            if(typeof endpoint.params[param].constraint == "string") {
+                                var regEx = new RegExp(endpoint.params[param].constraint, 'gi');
+                                if(typeof param.match(regEx) == null) {
+                                    check += "Parameter " + param + " is not accepted. ";
+                                };
+                                // else it is a function
+                            } else {
+                                if(!endpoint.params[param].constraint(externalParams[key])) {
+                                    check += "Parameter " + param + " is not accepted. ";
                                 }
-                                params[param] = externalParams["param" + i];
                             }
-
-                            i++;
+                            params[param] = externalParams[key];
+                        } else {
+                            console.log("parameter " + param + " does not exist");
                         }
-                        console.log("params", params);
+
+                        i++;
                     }
+                    console.log("--- params", params);
                 }
 
-
-                console.log("check", check);
                 if(check !== "") {
                     callback({result: false, msg: check});
                 } else {
                     // invoke the endpoint
                     model[dictionary[resource + "_" + method].method](callback, params, req);
                 }
-
-
-
             }
         } else {
             callback({result: false, msg: 'resource not found'});

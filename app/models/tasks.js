@@ -1,8 +1,6 @@
 var db = require("./db").db;
 var utils = require("../libraries/utils");
-console.log(utils);
 var statuses = {};
-
 statuses.new = 0;
 statuses.done = 1;
 var tasks = {
@@ -15,32 +13,30 @@ var tasks = {
         callback = callback || function(){};
         var sql = "SELECT * FROM tasks WHERE status = " + status + " and userid = " + req.session.user.id + " order by id desc";
         db.query(sql, function(err, rows, fields) {
-            if (err) throw err;
-            callback(rows, fields);
+            if (err) {
+                console.log("models tasks getTasks error", err);
+                callback({result: true});
+            } else {
+                callback({result: true, data: rows});
+            }
         });
     },
     add: function(callback, params, req) {
-        var title       = params.params[0];
-        var description = params.params[1];
-        var private     = params.params[2] == 'on' ? 1 : 0;
+        var post  = {
+            name: params.title,
+            description: params.description ? params.description : "",
+            userid: req.session.user.id,
+            update_date: utils.getMysqlDate(),
+            private: params.private ? params.private : 1
+        };
+        db.query('INSERT INTO tasks SET ?', post, function(err, sqlResult) {
+            var result = false;
+            if(err) console.log("model tasks add err", err);
+            console.log("model tasks add result", sqlResult);
+            if(sqlResult.affectedRows == 1) result = true;
+            callback(result);
+        });
 
-        if(title.length > 0) {
-            var post  = {
-                name: title,
-                description: description,
-                userid: req.session.user.id,
-                update_date: utils.getMysqlDate(),
-                private: private
-            };
-            db.query('INSERT INTO tasks SET ?', post, function(err, result) {
-                if(err) console.log(err);
-                console.log(result);
-                if(result.affectedRows == 1) result = true;
-                callback(result);
-            });
-        } else {
-            callback({result:false, msg: "task title cannot be empty"});
-        }
     },
     setStatus: function(callback, params, req){
         if(params.status === "done") {
@@ -49,7 +45,7 @@ var tasks = {
         db.query('UPDATE tasks SET ? WHERE id = ' + params.id, {status: status}, function(err, result) {
             if(err) {
                 console.log(err);
-                callback({result: false, msg: "An model error has occured"});
+                callback({result: false, msg: "A model error has occurred"});
             } else {
                 var bool = false;
                 if(result.affectedRows == 1) {

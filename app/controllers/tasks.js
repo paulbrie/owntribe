@@ -6,18 +6,19 @@ var pipe        = require('../libraries/smartpipe');
  * @param res
  */
 function addTask(req, res) {
-    req._store.addTaskResult = false;
-    req._store.addTaskErrorMsg = "";
-    if(req.body.title.length != 0) {
-        tasks_model.add(function(result){
-            req._store.addTaskResult = result;
-            req._store.addTaskErrorMsg = "Sorry, something went wrong.";
-            pipe.next(req, res);
-        }, {params:[req.body.title, req.body.description, req.body.private]}, req);
-    } else {
-        req._store.addTaskErrorMsg = "The title can't be empty.";
-        pipe.next(req, res);
+    console.log("req.body", req.body);
+    req.internalCall = {
+        resource: "tasks",
+        method  : "add",
+        params  : {
+            title       : req.body.title,
+            description : req.body.description
+        }
     }
+    req.api.loadResource(req, function(result){
+        req._store.addTaskResult = result;
+        pipe.next(req, res);
+    });
 }
 
 function setTaskStatus(status) {
@@ -37,8 +38,8 @@ function getTasks(req, res) {
         method  : "get"
     }
     req.api.loadResource(req, function(result){
-        if(typeof result === "object") {
-            req._store.tasks = result;
+        if(result.result) {
+            req._store.tasks = result.data;
         } else {
             req._store.tasks = {};
         }
@@ -57,7 +58,6 @@ function getDone(req, res) {
         method  : "get",
         param1  : "done"
     };
-
     req.api.loadResource(req, function(tasks){
         req._store.tasks_done = tasks;
         pipe.next(req, res);
