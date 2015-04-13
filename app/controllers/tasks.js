@@ -6,7 +6,7 @@ var pipe        = require('../libraries/smartpipe');
  * @param res
  */
 function addTask(req, res) {
-    console.log("req.body", req.body);
+    console.log("--- req.body", req.body);
     req.internalCall = {
         resource: "tasks",
         method  : "add",

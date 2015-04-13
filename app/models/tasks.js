@@ -39,8 +39,13 @@ var tasks = {
 
     },
     setStatus: function(callback, params, req){
-        if(params.status === "done") {
-            status = 1;
+        var status = 1;
+        switch(params.status) {
+            case "done":
+                status = 1;
+                break;
+            case "new":
+                status = 0;
         }
         db.query('UPDATE tasks SET ? WHERE id = ' + params.id, {status: status}, function(err, result) {
             if(err) {

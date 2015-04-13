@@ -13,7 +13,7 @@ var dictionary = {
         method: 'add',
         params: {
             title: {
-                constraint: ".*",
+                constraint: ".+",
                 required: true
             },
             description: {
@@ -45,7 +45,7 @@ var dictionary = {
                 required: true
             },
             status: {
-                constraint: 'done',
+                constraint: '[new|done]',
                 required: true
             }
         },
@@ -99,8 +99,6 @@ function loadResource(req, callback) {
         var externalParams  = req.params || {};
     }
 
-    console.log("--> ", resource + "_" + method);
-
     var endpoint = dictionary[resource + "_" + method];
     if(!endpoint.expose) {
         callback({result: false, msg: 'This endpoint does not exist.'});
@@ -119,21 +117,18 @@ function loadResource(req, callback) {
                 if(endpoint.params) {
                     var i = 1;
                     for (var param in endpoint.params) {
-
                         var key = req.internalCall ? param : "param" + i;
-                        console.log("    build parameter " + key);
-                        // parameter is required but is missing
-                        // if(!externalParams["param" + i] && endpoint.params[param].required) {
-                        //    console.log("api.js > parameter " + param + " is required");
-                        //    callback({result: false, msg: "parameter " + param + " is required"});
-                        // }
+                        /**
+                         * TODO: is required mechanism at param level
+                         */
 
                         // if the parameter exists, prepare it for the model
-                        if(externalParams[key]) {
+                        if(key in externalParams) {
                             // if constraint is of type regex
                             if(typeof endpoint.params[param].constraint == "string") {
                                 var regEx = new RegExp(endpoint.params[param].constraint, 'gi');
-                                if(typeof param.match(regEx) == null) {
+                                if(externalParams[key].match(regEx) == null) {
+                                    console.log("---- is null");
                                     check += "Parameter " + param + " is not accepted. ";
                                 };
                                 // else it is a function
@@ -149,9 +144,7 @@ function loadResource(req, callback) {
 
                         i++;
                     }
-                    console.log("--- params", params);
                 }
-
                 if(check !== "") {
                     callback({result: false, msg: check});
                 } else {
