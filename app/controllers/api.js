@@ -176,7 +176,8 @@ function loadResource(req, callback) {
                                 // else it is a function
                             } else {
                                 if(!endpoint.params[param].constraint(externalParams[key])) {
-                                    check += "Parameter " + param + " is not accepted. ";
+                                    check += "Parameter " + param + "(" +
+                                    externalParams[key] + ") is not accepted. ";
                                 }
                             }
                             params[param] = externalParams[key];

@@ -1,4 +1,4 @@
-var pipe        = require('../libraries/smartpipe');
+var pipe        = require('../libraries/smartpipe')();
 
 /**
  * adds a task for the current user

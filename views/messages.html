@@ -89,8 +89,11 @@
         $( "button[type='submit']" ).click(function(){
             $("._loader").show();
             var emails = [];
-            $.each($(".js-email:visible"), function(key, div){
-                console.log("div", div);
+            var selector = ".js-email";
+            if($(".js-all:visible").length == 0) {
+                selector += ":visible";
+            }
+            $.each($(selector), function(key, div){
                 emails.push($(div).attr('emailaddr'));
             });
             console.log(emails);

@@ -1,4 +1,6 @@
-var pipe = require('../libraries/smartpipe');
+var pipe = require('../libraries/smartpipe')();
+
+console.log
 
 function login(req, res) {
     console.log('login');

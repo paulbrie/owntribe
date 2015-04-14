@@ -40,6 +40,7 @@ app.use(function(req, res, next) {
         return v;
     }
     req.api = require('./app/controllers/api')(app);
+    req.spipe = new require('./app/libraries/smartpipe')();
     next();
 });
 
