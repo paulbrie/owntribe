@@ -15,10 +15,10 @@
                     </button>
                 </div>
                 {% for email in emails %}
-                <div class="btn-group js-email" style="display: none" emailaddr="{{email}}">
-                    <button type="button" class="btn btn-default" aria-expanded="false" >{{email}}</button>
+                <div class="btn-group" style="display: none">
+                    <button type="button" class="btn btn-default js-email" aria-expanded="false" emailaddr="{{email}}">{{email}}</button>
                     <button class="btn btn-primary" type="button">
-                        <span class="glyphicon glyphicon-remove" aria-hidden="false"></span>
+                        <span class="glyphicon glyphicon-remove js-email-remove" aria-hidden="false"></span>
                     </button>
                 </div>
                 {% endfor %}
@@ -33,10 +33,29 @@
             <button type="submit" class="btn btn-default">Submit</button>
             <img class="_loader" src="img/ajax-loader.gif" style="display:none" />
         </form>
+        <div id="myModal" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">{{_t('confirm')|capitalize}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="onlyThisEmail()">{{_t('confirm')|capitalize}}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% include 'includes/footer_scripts.html' %}
 <script type="text/javascript">
+    // select one single email
+    var onlyThis;
     $(document).ready(function(){
         // init the view
         $("._loader").hide();
@@ -50,15 +69,21 @@
         // events
         $( ".js-all" ).click(function(){
             $(".js-all").hide();
-            $(".js-email").show();
+            $(".js-email").parent().show();
         });
 
-        $( ".js-email" ).click(function(){
-            $(this).hide(300, function(){
-                if($(".js-email:visible").length == 0) {
+        $( ".js-email-remove" ).click(function(){
+            $(this).parent().parent().hide(300, function(){
+                if($(".js-email:visible").parent().length == 0) {
                     $(".js-all").show();
                 }
             });
+        });
+
+        $( ".js-email" ).click(function(){
+            onlyThis = this;
+            $('#myModal').modal('show');
+            $('#myModal .modal-body p').html("Select <strong><a href='javascript:void(0);'> " + $(this).attr("emailaddr") + "</a></strong>?");
         });
 
         $( "button[type='submit']" ).click(function(){
@@ -82,6 +107,11 @@
                 if(res.result) {
                     $("._notification").show();
                     setTimeout('$("._notification").hide()', 2000);
+                    $("#title").val("");
+                    $("textarea").val("");
+                    $(".js-all").show();
+                    $(".js-email").parent().hide();
+
                 } else {
 
                 }
@@ -89,5 +119,10 @@
             });
         });
     });
+
+    function onlyThisEmail() {
+        $(".js-email").parent().hide();
+        $(onlyThis).parent().show();
+    }
 </script>
 {% include 'includes/footer.html' %}
