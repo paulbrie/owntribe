@@ -18,7 +18,7 @@ var messages = {
 
         var mailOptions = {
             from: 'Owntribe <meyetribee@gmail.com>', // sender address
-            to: 'aelythe@gmail.com', // list of receivers
+            to: params.emails, // list of receivers
             subject: params.title, // Subject line
             text: params.body, // plaintext body
             html: params.body // html body

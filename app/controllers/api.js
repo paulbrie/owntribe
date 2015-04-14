@@ -19,6 +19,10 @@ var dictionary = {
             body: {
                 constraint: ".+",
                 required: true
+            },
+            emails: {
+                constraint: ".+",
+                required: false
             }
         },
         authenticated: true

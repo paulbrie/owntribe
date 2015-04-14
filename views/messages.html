@@ -15,8 +15,8 @@
                     </button>
                 </div>
                 {% for email in emails %}
-                <div class="btn-group js-email" style="display: none">
-                    <button type="button" class="btn btn-default" aria-expanded="false">{{email}}</button>
+                <div class="btn-group js-email" style="display: none" emailaddr="{{email}}">
+                    <button type="button" class="btn btn-default" aria-expanded="false" >{{email}}</button>
                     <button class="btn btn-primary" type="button">
                         <span class="glyphicon glyphicon-remove" aria-hidden="false"></span>
                     </button>
@@ -64,8 +64,9 @@
         $( "button[type='submit']" ).click(function(){
             $("._loader").show();
             var emails = [];
-            $.each($("._emails"), function(key, button){
-                emails.push($(button).text());
+            $.each($(".js-email:visible"), function(key, div){
+                console.log("div", div);
+                emails.push($(div).attr('emailaddr'));
             });
             console.log(emails);
             $.ajax({
@@ -73,7 +74,7 @@
                 data: {
                     title: $("#title").val(),
                     body: $("textarea").val(),
-                    emails: emails
+                    emails: emails.join(",")
                 },
                 method: "POST"
             }).done(function (res) {
