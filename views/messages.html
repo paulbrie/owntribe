@@ -1,0 +1,70 @@
+{% include 'includes/header.html' %}
+{% include 'includes/menu.html' %}
+<div class="container">
+
+    <div class="starter-template">
+        <div class="alert alert-success _notification" role="alert" style="float:right;display:none">Your email has been sent!</div>
+        <h1>{{h1}}</h1>
+        <form method="post" class="_messages">
+            <div class="form-group">
+                <strong>{{_t('to :')|capitalize}}</strong>
+                {% for email in emails %}
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default" aria-expanded="false">{{email}}</button>
+                    <button class="btn btn-primary _emails" type="button">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="false"></span>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+
+                <input type="text" class="form-control" id="title" placeholder="Object" name="title" autofocus>
+            </div>
+            <div class="checkbox">
+                <textarea id="message_body" class="form-control" rows="3" placeholder="message"></textarea>
+            </div>
+            <button type="submit" class="btn btn-default">Submit</button>
+            <img class="_loader" src="img/ajax-loader.gif" style="display:none" />
+        </form>
+    </div>
+</div>
+{% include 'includes/footer_scripts.html' %}
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("._loader").hide();
+
+        $( "form._messages" ).submit(function( event ) {
+            event.preventDefault();
+        });
+
+        $("button[type='submit']").click(function(){
+            console.log("submit");
+            $("._loader").show();
+            var emails = [];
+            $.each($("._emails"), function(key, button){
+                emails.push($(button).text());
+            });
+            console.log(emails);
+            $.ajax({
+                url: "/api/messages/send",
+                data: {
+                    title: $("#title").val(),
+                    body: $("textarea").val(),
+                    emails: emails
+                },
+                method: "POST"
+            }).done(function (res) {
+                console.log(res);
+                if(res.result) {
+                    $("._notification").show();
+                    setTimeout('$("._notification").hide()', 2000);
+                } else {
+
+                }
+                $("._loader").hide();
+            });
+        });
+    });
+</script>
+{% include 'includes/footer.html' %}
