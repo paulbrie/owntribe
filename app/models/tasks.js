@@ -55,43 +55,49 @@ var tasks = {
             if(err) {
                 console.log("ERROR:model/tasks/add", err);
             } else {
-                if(sqlResult.affectedRows == 1) result = true;
-            }
+                if (sqlResult.affectedRows == 1) result = true;
+                /**
+                 *  if the user assigns a task to another user, notify the assignee
+                 *  TODO: figure out a solution to guarantee email delivery
+                 */
+                if (task.userid != task.assignee) {
+                    // reload users... it's bad I know
+                    // TODO: find a better solution...
+                    req.internalCall = {
+                        resource: "users",
+                        method: "get",
+                        params: {
+                            userid: task.assignee
+                        }
+                    };
 
-            /**
-             *  if the user assigns a task to another user, notify the assignee
-             *  TODO: figure out a solution to guarantee email delivery
-             */
-            if(task.userid != task.assignee) {
-                // reload users... it's bad I know
-                // TODO: find a better solution...
-                req.internalCall = {
-                    resource: "users",
-                    method  : "get",
-                    params  : {
-                        userid: task.assignee
-                    }
-                };
+                    req.api.loadResource(req, function (user) {
+                        var userName = utils.ucfirst(user.data.fname + " " + user.data.lname);
 
-                req.api.loadResource(req, function(user){
-                    if(user.result == true) {
-                        var mailOptions = {
-                            from    : "Owntribe <meyetribe@gmail.com>",
-                            to      : user.data.email,
-                            subject : user.data.fname + " " + user.data.lname + " assigned a task to you: " + task.name,
-                            text    : "a new task has been assigned to you by " +
-                                        req.session.user.fname + " " +
-                                        req.session.user.lname + "\n" +
-                                        task.description
-                            // TODO: activate html detection and send the email according to the original format
-                            // html    : req._store.body
-                        };
-                        /**
-                         * send the notification in async mode
-                         */
-                        emailService.send(mailOptions, function(result){console.log(result);});
-                    }
-                });
+                        if (user.result == true) {
+                            var mailOptions = {
+                                from: "Owntribe <meyetribe@gmail.com>",
+                                to: user.data.email,
+                                subject: userName + " assigned you a task: " + task.name,
+                                html: "<p>A new task has been assigned to you by " + userName + "</p><hr />" +
+                                "<strong>" + utils.ucfirst(task.name) + "</strong>" +
+                                "<p>" + task.description + "</p><hr />" +
+                                "<a href='" + global.tribeSettings.server.protocol + "://" +
+                                global.tribeSettings.server.url + ":" + global.tribeSettings.server.port +
+                                "/tasks'>Click here to access your tasks!</a>" +
+                                "<p style='color: orangered'><a href='https://github.com/paulbrie/owntribe/' style='color:'>" +
+                                "Create your own tribe and get in control of your digital life!</a>"
+
+                            };
+                            /**
+                             * send the notification in async mode
+                             */
+                            emailService.send(mailOptions, function (result) {
+                                console.log(result);
+                            });
+                        }
+                    });
+                }
             }
             callback({result:result});
         });

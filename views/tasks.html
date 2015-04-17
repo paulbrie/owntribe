@@ -10,7 +10,7 @@
                     <div class="form-group">
                         <label for="title">Title</label>
                         <input type="text" class="form-control" id="title" placeholder="Enter a task title" name="title"
-                               tabindex="1" autofocus>
+                               autofocus>
                     </div>
                     <div class="form-group">
                         <label for="description">Description</label>
@@ -48,17 +48,25 @@
             {% endif %}
             <div role="tabpanel">
 
-                <!-- Nav tabs -->
+                <!---------- NAV TABS ---------->
                 <ul class="nav nav-tabs" style="margin-bottom: 10px" role="tablist">
-                    <li role="presentation" class="active"><a href="#todo-list" aria-controls="todo-list" role="tab" data-toggle="tab">To do <span class="badge todo">{{tasks_number}}</span></a></li>
-                    <li role="presentation"><a href="/tasks/done" aria-controls="done-list" role="tab" data-toggle="tabajax" data-target="#done-list">Done <span class="badge">{{done_number}}</span></a></li>
+                    <li role="presentation" class="active">
+                        <a href="#todo-list" aria-controls="todo-list" role="tab" data-toggle="tab">
+                            To do <span class="badge todo"></span>
+                        </a>
+                    </li>
+                    <li role="presentation">
+                        <a href="/tasks/done" aria-controls="done-list" role="tab" data-toggle="tabajax"
+                           data-target="#done-list">Done <span class="badge"></span>
+                        </a>
+                    </li>
                 </ul>
 
-                <!-- Tab panes -->
+                <!---------- TAB PANES ---------->
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active" id="todo-list">
                         <img src="img/ajax-loader.gif" style="margin: auto; display: none"/>
-                        <!----- task template -->
+                        <!----- TASK TEMPLATE -->
                         <div style="display: none;">
                             <div class="list-group" >
                                 <a href="#" class="list-group-item" style="height:57px">
@@ -69,36 +77,44 @@
                                 </a>
                             </div>
                         </div>
-                        <!----- end task template -->
+                        <!----- END TASK TEMPLATE ----->
 
                         <div class="btn-group js-filter" role="group" aria-label="Label">
                             <button type="button" class="btn btn-primary js-filter-mine">
-                                My tasks <span class="badge">1</span>
+                                My tasks <span class="badge"></span>
                             </button>
                             <button type="button" class="btn btn-default js-filter-assigned">
-                                Assigned to others <span class="badge">1</span>
+                                Assigned to others <span class="badge"></span>
                             </button>
                             <button type="button" class="btn btn-default js-filter-all">
-                                All <span class="badge">1</span>
+                                All <span class="badge"></span>
                             </button>
                         </div>
 
                         {% for task in tasks %}
-                        <div class="list-group js-task"
-                             style="margin-top: 10px;{% if task.userid != task.assignee %}display:none{% endif %}"
+                        <div class="list-group js-task" style="margin-top: 10px;display:none"
                              taskuserid="{{task.userid}}" taskassignee="{{task.assignee}}">
-                            <a href="#" class="list-group-item" style="height: 55px">
+                            <a href="#" class="list-group-item" style="min-height: 55px">
+                                {% if task.assignee == userid %}
                                 <button taskid="{{task.id}}" style="float:right" type="button" class="btn btn-primary add"
                                         onclick="setTaskStatus(this)" action="done">Done!</button>
-                                <h4 class="list-group-item-heading">#{{task.id}} {{task.name}}
-                                    {% if task.assignee != task.userid %}
-                                    <span class="label label-default">
+                                {% endif %}
+                                <h4 class="list-group-item-heading">#{{task.id}} {{task.name}}</h4>
+                                <p class="list-group-item-text">{{task.description}}
+                                    <p style="margin-top: 10px">
+                                        <span style="color:darkgrey;font-style: italic">created {{task.creation_date.toLocaleDateString()}}</span>
+                                        {% if userid != task.assignee  %}
+                                        <span class="label label-default">
                                         Assigned to {{usersById[task.assignee].fname|capitalize}}
-                                        {{usersById[task.assignee].lname|capitalize}}
-                                    </span>
-                                    {% endif %}</h4>
-
-                                <p class="list-group-item-text">{{task.description}}</p>
+                                        {{usersById[task.assignee].lname|capitalize}}</span>
+                                        {% endif %}
+                                        {% if userid != task.userid %}
+                                        <span class="label label-info">
+                                        Assigned by {{usersById[task.assignee].fname|capitalize}}
+                                        {{usersById[task.assignee].lname|capitalize}}</span>
+                                        {% endif %}
+                                    </p>
+                                </p>
 
                             </a>
                         </div>
@@ -169,10 +185,9 @@
     function populateBadges() {
         $(".js-filter-all span").text($(".js-task").length);
         $(".js-filter-assigned span").text($(".js-task[taskassignee!='" +userid + "']").length);
-        $(".js-filter-mine span").text($(".js-task[taskassignee='" +userid + "']").length);
-        $(".badge.todo").text($("#todo-list").children().length);
+        $(".js-filter-mine span, .todo").text($(".js-task[taskassignee='" +userid + "']").length);
         $.each($(".badge"), function(k, v) {
-            console.log()
+            console.log(v)
             if ($(v).text() > 0) {
                 $(v).show();
             } else {
@@ -182,8 +197,10 @@
     }
 
     $(document).ready(function() {
-
+        // by default display the tasks assigned to the main user
+        setTimeout('$(".js-filter-mine").click()', 20);
         populateBadges();
+
 
         $('#new').click(function () {
             toggleAddForm();
@@ -203,7 +220,7 @@
             $(this).addClass("btn-primary");
             if($(this).hasClass("js-filter-mine")) {
                 $.each($(".js-task"),function(key, value){
-                    if($(value).attr("taskuserid") == $(value).attr("taskassignee")) {
+                    if($(value).attr("taskassignee") == userid) {
                         $(value).show();
                     } else {
                         $(value).hide();
@@ -211,7 +228,7 @@
                 });
             } else if ($(this).hasClass("js-filter-assigned")) {
                 $.each($(".js-task"),function(key, value){
-                    if($(value).attr("taskuserid") != $(value).attr("taskassignee")) {
+                    if($(value).attr("taskassignee") != userid) {
                         $(value).show();
                     } else {
                         $(value).hide();
