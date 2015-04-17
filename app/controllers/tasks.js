@@ -1,5 +1,3 @@
-var pipe        = require('../libraries/smartpipe')();
-
 /**
  * adds a task for the current user
  * @param req
@@ -12,18 +10,14 @@ function addTask(req, res) {
         method  : "add",
         params  : {
             title       : req.body.title,
-            description : req.body.description
+            description : req.body.description,
+            assignee    : req.body.assignee,
+            private     : req.body.private === "on" ? 1 : 0
         }
     }
     req.api.loadResource(req, function(result){
         req._store.addTaskResult = result;
-        pipe.next(req, res);
-    });
-}
-
-function setTaskStatus(status) {
-    tasks_model.setStatus(status, function(result){
-
+        req.spipe.next(req, res);
     });
 }
 
@@ -43,7 +37,22 @@ function getTasks(req, res) {
         } else {
             req._store.tasks = {};
         }
-        pipe.next(req, res);
+        req.spipe.next(req, res);
+    });
+}
+
+function getUsers(req, res) {
+    req.internalCall = {
+        resource: "users",
+        method  : "get"
+    }
+    req.api.loadResource(req, function(result){
+        if(result.result) {
+            req._store.users = result.data;
+        } else {
+            req._store.users = {};
+        }
+        req.spipe.next(req, res);
     });
 }
 
@@ -60,7 +69,7 @@ function getDone(req, res) {
     };
     req.api.loadResource(req, function(tasks){
         req._store.tasks_done = tasks;
-        pipe.next(req, res);
+        req.spipe.next(req, res);
     });
 }
 
@@ -71,6 +80,13 @@ function getDone(req, res) {
  * @param tasks
  */
 function render(req, res, tasks) {
+    
+    var usersById = {};
+    for(var user in req._store.users) {
+        usersById[req._store.users[user].id] = req._store.users[user];
+    }
+    
+    
     res.render('tasks', {
         title: 'Owntribe',
         h1: 'Tasks',
@@ -79,7 +95,10 @@ function render(req, res, tasks) {
         addTaskResult: req._store.addTaskResult,
         addTaskErrorMsg: req._store.addTaskErrorMsg,
         logged: req.session.user.logged,
-        tasks_number: req._store.tasks.length || 0
+        tasks_number: req._store.tasks.length || 0,
+        users: req._store.users,
+        usersById: usersById,
+        userid: req.session.user.id
     });
 }
 
@@ -99,23 +118,22 @@ module.exports = function(app) {
     return {
         tasks: function(req, res) {
             // TODO: @Robert, make it better! :)
-            console.log(pipe.steps);
             if(!req.session.user.logged) {
                 res.redirect('/login');
             } else {
                 // if method is POST we have a task to add
-                if(req.method === 'POST') pipe.add(addTask);
+                if(req.method === 'POST') req.spipe.add(addTask);
 
-                pipe.add(getTasks, render);
-                pipe.next(req, res);
+                req.spipe.add(getTasks, getUsers, render);
+                req.spipe.next(req, res);
             }
         },
         done: function(req, res) {
             if(!req.session.user.logged) {
                 res.redirect('/login');
             } else {
-                pipe.add(getDone, render_done);
-                pipe.next(req, res);
+                req.spipe.add(getDone, render_done);
+                req.spipe.next(req, res);
             }
         }
     };

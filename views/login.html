@@ -8,16 +8,28 @@
     <form method="post" action="" onsubmit="return false;">
         <div class="form-group">
             <label for="email">Login</label>
-            <input type="text" class="form-control" id="email" placeholder="login or email" name="title" />
+            <input type="text" class="form-control" id="email" placeholder="login or email" name="title"
+                   {% if !production %} value="{{ autoLog.email }}"{% endif %}/>
         </div>
         <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" class="form-control" id="password" placeholder="password" name="description" />
+            <input type="password" class="form-control" id="password" placeholder="password" name="description"
+                   {% if !production %} value="{{ autoLog.password }}"{% endif %}/>
         </div>
         <button id="login" class="btn btn-default" onclick="doLogin()">Submit</button>
     </form>
 </div>
 {% include 'includes/footer_scripts.html' %}
+
+{% if !production %}
+<!-- in dev mode, autologin -->
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#email').focus();
+        //$('#login').click();
+    });
+</script>
+{% endif %}
 <script type="text/javascript">
 
     $(document).ready(function(){

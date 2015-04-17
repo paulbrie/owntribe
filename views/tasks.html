@@ -3,17 +3,26 @@
 <div class="container">
     <div class="starter-template">
         <h1>{{h1}}<button id="new" type="button" class="btn btn-primary add" style="float:right">New task ( N )</button></h1>
-        <div class="panel panel-primary" id="add" style="display:none">
+        <div class="panel panel-primary" id="add" style="top:-1000px; position:absolute">
             <div class="panel-heading">New task</div>
             <div class="panel-body">
                 <form method="post" action="tasks">
                     <div class="form-group">
                         <label for="title">Title</label>
-                        <input type="text" class="form-control" id="title" placeholder="Enter a task title" name="title" autofocus>
+                        <input type="text" class="form-control" id="title" placeholder="Enter a task title" name="title"
+                               tabindex="1" autofocus>
                     </div>
                     <div class="form-group">
                         <label for="description">Description</label>
                         <input type="text" class="form-control" id="description" placeholder="A description (optional)" name="description">
+                    </div>
+                    <div class="form-group">
+                        {{_t('Assignee')}}
+                        <select class="form-control" name="assignee">
+                            {% for user in users %}
+                            <option value="{{user.id}}" {% if userid == user.id %} selected {% endif %}>{{user.fname}} {{user.lname}}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="checkbox">
                         <label>
@@ -37,7 +46,6 @@
                 </script>
             </div>
             {% endif %}
-
             <div role="tabpanel">
 
                 <!-- Nav tabs -->
@@ -62,15 +70,36 @@
                             </div>
                         </div>
                         <!----- end task template -->
+
+                        <div class="btn-group js-filter" role="group" aria-label="Label">
+                            <button type="button" class="btn btn-primary js-filter-mine">
+                                My tasks <span class="badge">1</span>
+                            </button>
+                            <button type="button" class="btn btn-default js-filter-assigned">
+                                Assigned to others <span class="badge">1</span>
+                            </button>
+                            <button type="button" class="btn btn-default js-filter-all">
+                                All <span class="badge">1</span>
+                            </button>
+                        </div>
+
                         {% for task in tasks %}
-                        <div class="list-group">
-                            <a href="#" class="list-group-item" style="height:57px">
+                        <div class="list-group js-task"
+                             style="margin-top: 10px;{% if task.userid != task.assignee %}display:none{% endif %}"
+                             taskuserid="{{task.userid}}" taskassignee="{{task.assignee}}">
+                            <a href="#" class="list-group-item" style="height: 55px">
                                 <button taskid="{{task.id}}" style="float:right" type="button" class="btn btn-primary add"
                                         onclick="setTaskStatus(this)" action="done">Done!</button>
                                 <h4 class="list-group-item-heading">#{{task.id}} {{task.name}}
+                                    {% if task.assignee != task.userid %}
+                                    <span class="label label-default">
+                                        Assigned to {{usersById[task.assignee].fname|capitalize}}
+                                        {{usersById[task.assignee].lname|capitalize}}
+                                    </span>
+                                    {% endif %}</h4>
 
-                                </h4>
                                 <p class="list-group-item-text">{{task.description}}</p>
+
                             </a>
                         </div>
                         {% endfor %}
@@ -102,6 +131,8 @@
     // this should not happen if one of the form elements has focus
     var keyToggle = true;
 
+    var userid = {{userid}};
+
     function setTaskStatus(node) {
         $.ajax({
             url: "/api/tasks/set/" + $(node).attr("taskid") + "/" + $(node).attr("action")
@@ -116,7 +147,7 @@
                         height: 0
                     }, 300, function(){
                         $(this).remove();
-                        $(".badge.todo").text($("#todo-list").children().length);
+                        populateBadges();
                     });
                 }, 300);
 
@@ -126,10 +157,36 @@
         });
     }
 
+    function toggleAddForm() {
+        if($("#add").css("position") == "" || $("#add").css("position") == "static") {
+            $("#add").css("position","absolute");
+        } else if($("#add").css("position") == "absolute"){
+            $("#add").css("position","");
+            $("#title").focus();
+        }
+    }
+
+    function populateBadges() {
+        $(".js-filter-all span").text($(".js-task").length);
+        $(".js-filter-assigned span").text($(".js-task[taskassignee!='" +userid + "']").length);
+        $(".js-filter-mine span").text($(".js-task[taskassignee='" +userid + "']").length);
+        $(".badge.todo").text($("#todo-list").children().length);
+        $.each($(".badge"), function(k, v) {
+            console.log()
+            if ($(v).text() > 0) {
+                $(v).show();
+            } else {
+                $(v).hide();
+            }
+        });
+    }
+
     $(document).ready(function() {
+
+        populateBadges();
+
         $('#new').click(function () {
-            $('#add').toggle();
-            $("#title").click();
+            toggleAddForm();
         });
 
         $("#title, #description").focusin(function(){
@@ -140,13 +197,36 @@
             keyToggle = true;
         });
 
+        $(".js-filter button").click(function(){
+            $(".js-filter button").removeClass("btn-primary");
+            $(".js-filter button").addClass("btn-default");
+            $(this).addClass("btn-primary");
+            if($(this).hasClass("js-filter-mine")) {
+                $.each($(".js-task"),function(key, value){
+                    if($(value).attr("taskuserid") == $(value).attr("taskassignee")) {
+                        $(value).show();
+                    } else {
+                        $(value).hide();
+                    }
+                });
+            } else if ($(this).hasClass("js-filter-assigned")) {
+                $.each($(".js-task"),function(key, value){
+                    if($(value).attr("taskuserid") != $(value).attr("taskassignee")) {
+                        $(value).show();
+                    } else {
+                        $(value).hide();
+                    }
+                });
+            } else {
+                $(".js-task").show();
+            }
+        });
+
         $(window).keydown(function(event) {
             // if typing N
             if(event.keyCode  == 78) {
                 if(keyToggle) {
-                    $('#add').toggle(null, function(){
-                        $("#title").focus()
-                    });
+                    toggleAddForm();
                 }
             }
         });

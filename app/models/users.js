@@ -2,11 +2,19 @@ var db = require("./db").db;
 var sha1 = require("sha1");
 var users = {
     get: function(callback, params, req) {
-        db.query('SELECT * FROM users', function(err, rows) {
+        var getAllUsers = true;
+        var sql = 'SELECT * FROM users order by fname, lname';
+        if(req.internalCall.params && req.internalCall.params.userid) {
+            getAllUsers = false;
+            sql = 'SELECT * FROM users where id = ' + req.internalCall.params.userid;
+        }
+
+        db.query(sql, function(err, rows) {
             if(err) {
-                console.log(err);
+                console.log("ERROR:model/users/get", err);
                 callback({result: false});
             } else {
+                if(!getAllUsers) rows = rows[0];
                 callback({result: true, data: rows});
             }
         });
@@ -20,6 +28,8 @@ var users = {
                     req.session.user.logged = true;
                     req.session.user.email = rows[0].email;
                     req.session.user.id = rows[0].id;
+                    req.session.user.fname = rows[0].fname;
+                    req.session.user.lname = rows[0].lname;
                     callback({result: true});
                 } else {
                     console.log('mysql error', err);

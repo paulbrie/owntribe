@@ -1,4 +1,3 @@
-var tasks = require('../models/tasks');
 module.exports = function(app) {
     return {
         indexPage: function(req, res, next) {

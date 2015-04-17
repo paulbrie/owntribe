@@ -1,13 +1,5 @@
 'use strict';
 
-// constants
-var ENV         = process.env.NODE_ENV || "development";
-var SERVER      = 'localhost';
-var PROTOCOL    = 'http';
-var PORT        = '8080';
-var BASE_URL    = PROTOCOL + '://' + SERVER;
-if(SERVER && SERVER.length > 0) BASE_URL += ':' + PORT;
-
 // variables
 var express     = require('express');
 var session     = require('express-session');
@@ -16,22 +8,17 @@ var swig        = require('swig');
 var app         = express();
 var users       = require('./app/middleware/users')(app);
 var bodyParser  = require('body-parser');
-var config      = require('./config/environments/' + ENV);
-
+var Pipe        = require('./app/libraries/smartpipe');
 
 //app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
 }));
 
-app.set('config', config);
 app.engine('html', swig.renderFile);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'html');
 
-if (ENV === 'development') {
-    swig.setDefaults({ cache: false });
-}
 
 // localization
 app.use(function(req, res, next) {
@@ -40,7 +27,7 @@ app.use(function(req, res, next) {
         return v;
     }
     req.api = require('./app/controllers/api')(app);
-    req.spipe = new require('./app/libraries/smartpipe')();
+    req.spipe = new Pipe();
     next();
 });
 
@@ -51,6 +38,7 @@ app.use(session({
     },
     resave: false
 }));
+
 
 app.use(users.init);
 
@@ -69,6 +57,25 @@ app.use(users.init);
 app.use(express.static(__dirname + '/public'));
 
 // Go!
-app.listen(PORT, function (){
-    console.log("Server started on " + BASE_URL);
+var settings = require('./app/models/settings');
+settings.get(function(result){
+    if(result.result) {
+
+        var settings = {};
+
+        for(var item in result.data) {
+            settings[result.data[item].key] = JSON.parse(result.data[item].data);
+        }
+
+        // activate swig cache only in production
+        if(!settings.environment.production) swig.setDefaults({ cache: false });
+
+        global.tribeSettings = settings;
+
+        app.listen(parseInt(settings.server.port), function (){
+            console.log("Server started on " + settings.server.url);
+        });
+    } else {
+        console.log("The application could not start because it could not load the settings");
+    }
 });

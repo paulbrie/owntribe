@@ -39,6 +39,10 @@ var dictionary = {
             description: {
                 constraint: ".*",
                 required: true
+            },
+            assignee: {
+                constraint: intval,
+                required: true
             }
         },
         authenticated: true
@@ -222,3 +226,4 @@ module.exports = function(app) {
         loadResource: loadResource
     };
 };
+

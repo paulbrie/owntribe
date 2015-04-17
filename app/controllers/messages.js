@@ -16,10 +16,10 @@ function getUsers(req, res) {
     });
 }
 
-function render(req, res, tasks) {
+function render(req, res) {
     res.render('messages', {
         h1: "Messages",
-        emails: req._store.emails,
+        emails: req._store.emails
     });
 }
 

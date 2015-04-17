@@ -1,5 +1,18 @@
 module.exports = {
     google: {
-        analytics_code: 'UA-61571894-1'
+        analytics_code: ''
+    },
+    mailProvider: {
+        gmail: {
+            login: "meyetribe@gmail.com",
+            password: "JoinTheRevolution!!!"
+        }
+    },
+    dataStore: {
+        mysql: {
+            db: "owntribe",
+            user: "owntribe",
+            password: "owntribe"
+        }
     }
 }

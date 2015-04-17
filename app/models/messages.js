@@ -1,13 +1,7 @@
 var db = require("./db").db;
 var utils = require("../libraries/utils");
-var nodemailer = require('nodemailer');
-var transporter = nodemailer.createTransport({
-    service: 'Gmail',
-    auth: {
-        user: 'meyetribe@gmail.com',
-        pass: 'JoinTheRevolution!!!'
-    }
-});
+var emailService = require("../services/email");
+
 
 /**
  * saves into the db a message that is about to be sent
@@ -28,7 +22,6 @@ function insert(params, req) {
         };
 
         db.query('INSERT messages SET ?', insert, function(err, insertResult) {
-
             if(err) {
                 console.log("ERROR:models/messages/insert", err);
                 result.result = false;
@@ -41,9 +34,6 @@ function insert(params, req) {
                 result.result = true;
                 req.spipe.next(result, req);
             }
-
-
-
         });
     } else {
         var err = "one of the parameters (title, body) has an unexpected format";
@@ -83,27 +73,19 @@ function messageResult(params, req) {
 
 function sendMail(params, req) {
     if(params.result) {
+        console.log(req._store.body);
         var mailOptions = {
             from    : "Owntribe <meyetribe@gmail.com>",
             to      : req._store.emails,
             subject : req._store.title,
-            text    : req._store.body,
-            html    : req._store.body
+            text    : req._store.body
+            // TODO activate html detection and send the email according to the original format
+            // html    : req._store.body
         };
 
-        // send mail with defined transport object
-        transporter.sendMail(mailOptions, function(error, info){
-            var result = {};
-            req._store.sendMailInfo = info;
-            if (error) {
-                console.log("ERROR:models/messages/sendMail", error);
-                result.result   = false;
-                result.msg      = error;
-            } else {
-                result.result       = true;
-            }
+        emailService.send(mailOptions, function(result){
             req.spipe.next(result, req);
-        });
+        })
     }
 }
 
@@ -116,15 +98,12 @@ var messages = {
      */
     send: function(callback, params, req) {
 
-        //console.log("callback", callback);
-
         req.spipe.add("insert", insert);
         req.spipe.add("sendMail", sendMail);
         req.spipe.add("messageResult", messageResult);
         req.spipe.add("finalCallback", callback);
 
         req.spipe.next(params, req);
-
     }
 };
 

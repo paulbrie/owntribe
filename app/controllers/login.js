@@ -1,7 +1,5 @@
 var pipe = require('../libraries/smartpipe')();
 
-console.log
-
 function login(req, res) {
     console.log('login');
     var users_model = require('../models/users');
@@ -20,9 +18,11 @@ function login(req, res) {
  */
 function render(req, res) {
     res.render('login', {
-        title: 'Owntribe',
-        h1: 'Login',
-        logged: req.session.user.logged
+        title       : 'Owntribe',
+        h1          : 'Login',
+        logged      : req.session.user.logged,
+        production  : global.tribeSettings.environment.production,
+        autoLog     : global.tribeSettings.autoLog  // prefill login form in dev mode
     });
 }
 
@@ -40,7 +40,6 @@ module.exports = function(app) {
                 }
                 res.redirect('/login');
             } else {
-                var users_model = require('../models/users');
                 pipe.add(login, render);
                 pipe.next(req, res);
             }

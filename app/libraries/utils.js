@@ -19,6 +19,18 @@ module.exports = {
      */
     getTwoDigits: function (val) {
         return val > 9 ? "" + val : "0" + val;
+    },
+    getBoolean: function (value) {
+        switch (value) {
+            case "true":
+                return true;
+            break;
+            case "false":
+                return false;
+            break;
+            default:
+                return value;
+        }
     }
 }
 
