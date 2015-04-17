@@ -1,0 +1,130 @@
+{% include 'includes/header.html' %}
+{% include 'includes/menu.html' %}
+<div class="container">
+
+    <div class="starter-template">
+        <div class="alert alert-success _notification" role="alert" style="float:right;display:none">Your email has been sent!</div>
+        <h1>{{h1}}</h1>
+        <form method="post" class="_messages">
+            <div class="form-group" style="line-height: 3em">
+                <strong>{{_t('to :')|capitalize}}</strong>
+                <div class="btn-group js-all">
+                    <button type="button" class="btn btn-default" aria-expanded="false">All <span class="badge"></span></button>
+                    <button class="btn btn-primary _emails" type="button">
+                        <span class="glyphicon glyphicon-edit" aria-hidden="false"></span>
+                    </button>
+                </div>
+                {% for email in emails %}
+                <div class="btn-group" style="display: none">
+                    <button type="button" class="btn btn-default js-email" aria-expanded="false" emailaddr="{{email}}">{{email}}</button>
+                    <button class="btn btn-primary" type="button">
+                        <span class="glyphicon glyphicon-remove js-email-remove" aria-hidden="false"></span>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" id="title" placeholder="Object" name="title" autofocus>
+            </div>
+            <div class="checkbox">
+                <textarea id="message_body" class="form-control" rows="3" placeholder="message"></textarea>
+            </div>
+            <button type="submit" class="btn btn-default">Submit</button>
+            <img class="_loader" src="img/ajax-loader.gif" style="display:none" />
+        </form>
+        <div id="myModal" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">{{_t('confirm')|capitalize}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="onlyThisEmail()">{{_t('confirm')|capitalize}}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% include 'includes/footer_scripts.html' %}
+<script type="text/javascript">
+    // select one single email
+    var onlyThis;
+    $(document).ready(function(){
+        // init the view
+        $("._loader").hide();
+
+        $( "form._messages" ).submit(function( event ) {
+            event.preventDefault();
+        });
+
+        $( ".js-all .badge" ).text($(".js-email").length);
+
+        // events
+        $( ".js-all" ).click(function(){
+            $(".js-all").hide();
+            $(".js-email").parent().show();
+        });
+
+        $( ".js-email-remove" ).click(function(){
+            $(this).parent().parent().hide(300, function(){
+                if($(".js-email:visible").parent().length == 0) {
+                    $(".js-all").show();
+                }
+            });
+        });
+
+        $( ".js-email" ).click(function(){
+            onlyThis = this;
+            $('#myModal').modal('show');
+            $('#myModal .modal-body p').html("Select <strong><a href='javascript:void(0);'> " + $(this).attr("emailaddr") + "</a></strong>?");
+        });
+
+        $( "button[type='submit']" ).click(function(){
+            $("._loader").show();
+            var emails = [];
+            var selector = ".js-email";
+            if($(".js-all:visible").length == 0) {
+                selector += ":visible";
+            }
+            $.each($(selector), function(key, div){
+                emails.push($(div).attr('emailaddr'));
+            });
+            console.log(emails);
+            $.ajax({
+                url: "/api/messages/send",
+                data: {
+                    title: $("#title").val(),
+                    body: $("textarea").val(),
+                    emails: emails.join(",")
+                },
+                method: "POST"
+            }).done(function (res) {
+                console.log(res);
+                if(res.result) {
+                    $("._notification").show();
+                    setTimeout('$("._notification").hide()', 2000);
+                    $("#title").val("");
+                    $("textarea").val("");
+                    $(".js-all").show();
+                    $(".js-email").parent().hide();
+
+                } else {
+
+                }
+                $("._loader").hide();
+            });
+        });
+    });
+
+    function onlyThisEmail() {
+        $(".js-email").parent().hide();
+        $(onlyThis).parent().show();
+    }
+</script>
+{% include 'includes/footer.html' %}

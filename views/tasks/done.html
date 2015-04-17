@@ -1,0 +1,11 @@
+<p style="text-align:right"><a href="#" >Delete history of done tasks</a></p>
+{% for task in tasks %}
+<div class="list-group">
+    <a href="#" class="list-group-item" style="height:57px">
+        <h4 class="list-group-item-heading">#{{task.id}} {{task.name}}
+
+        </h4>
+        <p class="list-group-item-text">{{task.description}}</p>
+    </a>
+</div>
+{% endfor %}
