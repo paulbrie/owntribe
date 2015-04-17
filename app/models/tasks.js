@@ -72,7 +72,8 @@ var tasks = {
                     };
 
                     req.api.loadResource(req, function (user) {
-                        var userName = utils.ucfirst(user.data.fname + " " + user.data.lname);
+                        var userName = utils.ucfirst(req.session.user.fname) + " " +
+                                        utils.ucfirst(req.session.user.lname);
 
                         if (user.result == true) {
                             var mailOptions = {

@@ -111,7 +111,7 @@
                                         {% if userid != task.userid %}
                                         <span class="label label-info">
                                         Assigned by {{usersById[task.userid].fname|capitalize}}
-                                        {{usersById[task.assignee].lname|capitalize}}</span>
+                                        {{usersById[task.userid].lname|capitalize}}</span>
                                         {% endif %}
 
                                     </p>
