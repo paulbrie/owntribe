@@ -75,7 +75,7 @@ function sendMail(params, req) {
     if(params.result) {
         console.log(req._store.body);
         var mailOptions = {
-            from    : "Owntribe <meyetribe@gmail.com>",
+            from    : utils.ucfirst(req.session.user.fname) + "@Owntribe <meyetribe@gmail.com>",
             to      : req._store.emails,
             subject : req._store.title,
             text    : req._store.body
