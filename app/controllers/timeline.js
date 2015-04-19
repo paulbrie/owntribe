@@ -1,6 +1,7 @@
 function render(req, res, tasks) {
     res.render('timeline', {
-        h1: "Timeline"
+        h1  : "Timeline",
+        user: req.session.user
     });
 }
 

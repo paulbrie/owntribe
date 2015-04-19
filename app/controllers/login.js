@@ -22,7 +22,8 @@ function render(req, res) {
         h1          : 'Login',
         logged      : req.session.user.logged,
         production  : global.tribeSettings.environment.production,
-        autoLog     : global.tribeSettings.autoLog  // prefill login form in dev mode
+        autoLog     : global.tribeSettings.autoLog,  // prefill login form in dev mode
+        user        : req.session.user
     });
 }
 
@@ -34,11 +35,13 @@ function render(req, res) {
 module.exports = function(app) {
     return {
         index: function(req, res) {
+            // logout
             if(req.session.user.logged) {
                 req.session.user = {
                     logged: false
                 }
                 res.redirect('/login');
+            // login
             } else {
                 pipe.add(login, render);
                 pipe.next(req, res);

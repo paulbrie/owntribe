@@ -18,8 +18,9 @@ function getUsers(req, res) {
 
 function render(req, res) {
     res.render('messages', {
-        h1: "Messages",
-        emails: req._store.emails
+        h1      : "Messages",
+        emails  : req._store.emails,
+        user    : req.session.user
     });
 }
 

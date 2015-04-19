@@ -99,7 +99,8 @@ function render(req, res, tasks) {
         tasks_number: req._store.tasks.length || 0,
         users: req._store.users,
         usersById: usersById,
-        userid: req.session.user.id
+        userid: req.session.user.id,
+        user: req.session.user
     });
 }
 
