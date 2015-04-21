@@ -9,6 +9,7 @@ var app         = express();
 var users       = require('./app/middleware/users')(app);
 var bodyParser  = require('body-parser');
 var Pipe        = require('./app/libraries/smartpipe');
+var timer       = require('./app/libraries/timer');
 
 //app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -75,6 +76,7 @@ settings.get(function(result){
         app.listen(parseInt(settings.server.port), function (){
             console.log("Server started on " + settings.server.url);
         });
+
     } else {
         console.log("The application could not start because it could not load the settings");
     }

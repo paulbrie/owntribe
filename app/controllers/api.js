@@ -75,6 +75,13 @@ var dictionary = {
         },
         authenticated: true
     },
+    tasks_deletedone: {
+        expose: true,
+        model: 'tasks',
+        method: 'deleteDone',
+        params: {},
+        authenticated: true
+    },
     // ----- USERS -----
     users_login: {
         expose: true,

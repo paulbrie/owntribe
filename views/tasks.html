@@ -47,7 +47,6 @@
             </div>
             {% endif %}
             <div role="tabpanel">
-
                 <!---------- NAV TABS ---------->
                 <ul class="nav nav-tabs" style="margin-bottom: 10px" role="tablist">
                     <li role="presentation" class="active">
@@ -56,86 +55,113 @@
                         </a>
                     </li>
                     <li role="presentation">
-                        <a href="/tasks/done" aria-controls="done-list" role="tab" data-toggle="tabajax"
-                           data-target="#done-list">Done <span class="badge"></span>
+                        <a href="/tasks/done" aria-controls="done" role="tab" data-toggle="tabajax"
+                           data-target="#done">Done <span class="badge"></span>
                         </a>
                     </li>
                 </ul>
 
-                <!---------- TAB PANES ---------->
-                <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active" id="todo-list">
-                        <img src="img/ajax-loader.gif" style="margin: auto; display: none"/>
-                        <!----- TASK TEMPLATE -->
-                        <div style="display: none;">
-                            <div class="list-group" >
-                                <a href="#" class="list-group-item" style="height:57px">
-                                    <button taskid="" style="float:right" type="button" class="btn btn-primary"
-                                            onclick="setTaskStatus(this)">Done!</button>
-                                    <h4 class="list-group-item-heading"> </h4>
-                                    <p class="list-group-item-text"> </p>
-                                </a>
-                            </div>
-                        </div>
-                        <!----- END TASK TEMPLATE ----->
+            </div>
 
-                        <div class="btn-group js-filter" role="group" aria-label="Label">
-                            <button type="button" class="btn btn-primary js-filter-mine">
-                                My tasks <span class="badge"></span>
-                            </button>
-                            <button type="button" class="btn btn-default js-filter-assigned">
-                                Assigned to others <span class="badge"></span>
-                            </button>
-                            <button type="button" class="btn btn-default js-filter-all">
-                                All <span class="badge"></span>
-                            </button>
-                        </div>
-
-                        {% for task in tasks %}
-                        <div class="list-group js-task" style="margin-top: 10px;display:none"
-                             taskuserid="{{task.userid}}" taskassignee="{{task.assignee}}">
-                            <a href="#" class="list-group-item" style="min-height: 55px">
-                                {% if task.assignee == userid %}
-                                <button taskid="{{task.id}}" style="float:right" type="button" class="btn btn-primary add"
-                                        onclick="setTaskStatus(this)" action="done">Done!</button>
-                                {% endif %}
-                                <h4 class="list-group-item-heading">#{{task.id}} {{task.name}}</h4>
-                                <p class="list-group-item-text">{{task.description}}
-                                    <p style="margin-top: 10px">
-                                        <span style="color:darkgrey;font-style: italic">created {{task.creation_date.toLocaleDateString()}}</span>
-                                        {% if userid != task.assignee  %}
-                                        <span class="label label-default">
-                                        Assigned to {{usersById[task.assignee].fname|capitalize}}
-                                        {{usersById[task.assignee].lname|upper}}</span>
-                                        {% endif %}
-                                        {% if userid != task.userid %}
-                                        <span class="label label-info">
-                                        Assigned by {{usersById[task.userid].fname|capitalize}}
-                                        {{usersById[task.userid].lname|upper}}</span>
-                                        {% endif %}
-
-                                    </p>
-                                </p>
-
+            <!---------- TAB PANES ---------->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="todo-list">
+                    <img src="img/ajax-loader.gif" style="margin: auto; display: none"/>
+                    <!----- TASK TEMPLATE -->
+                    <div style="display: none;">
+                        <div class="list-group" >
+                            <a href="#" class="list-group-item" style="height:57px">
+                                <button taskid="" style="float:right" type="button" class="btn btn-primary"
+                                        onclick="setTaskStatus(this)">Done!</button>
+                                <h4 class="list-group-item-heading"> </h4>
+                                <p class="list-group-item-text"> </p>
                             </a>
                         </div>
-                        {% endfor %}
                     </div>
-                    <div role="tabpanel" class="tab-pane" id="done-list">
-                        <img class="loader" src="img/ajax-loader.gif" style="margin: auto; display: block"/>
-                        <!----- task template -->
-                        <div style="display: none;">
-                            <div class="list-group" >
-                                <a href="#" class="list-group-item" style="height:57px">
-                                    <button taskid="" style="float:right" type="button" class="btn btn-danger"
-                                            onclick="setTaskStatus(this)">Cancel</button>
-                                    <h4 class="list-group-item-heading"> </h4>
-                                    <p class="list-group-item-text"> </p>
-                                </a>
-                            </div>
+                    <!----- END TASK TEMPLATE ----->
+
+                    <div class="btn-group js-filter" role="group" aria-label="Label">
+                        <button type="button" class="btn btn-primary js-filter-mine">
+                            {{_t('mine'|capitalize)}} <span class="badge"></span>
+                        </button>
+                        <button type="button" class="btn btn-default js-filter-assigned">
+                            {{_t('theirs'|capitalize)}} <span class="badge"></span>
+                        </button>
+                        <button type="button" class="btn btn-default js-filter-all">
+                            {{_t('everyone'|capitalize)}} <span class="badge"></span>
+                        </button>
+                    </div>
+
+                    {% for task in tasks %}
+                    <div class="list-group js-task" style="margin-top: 10px;display:none"
+                         taskuserid="{{task.userid}}" taskassignee="{{task.assignee}}">
+                        <a href="#" class="list-group-item" style="min-height: 55px">
+                            {% if task.assignee == userid %}
+                            <button taskid="{{task.id}}" style="float:right" type="button" class="btn btn-primary add"
+                                    onclick="setTaskStatus(this)" action="done">Done!</button>
+                            {% endif %}
+                            <h4 class="list-group-item-heading">#{{task.id}} {{task.name}}</h4>
+                            <p class="list-group-item-text">{{task.description}}
+                                <p style="margin-top: 10px">
+                                    <span style="color:darkgrey;font-style: italic">created {{task.creation_date.toLocaleDateString()}}</span>
+                                    {% if userid != task.assignee  %}
+                                    <span class="label label-default">
+                                    Assigned to {{usersById[task.assignee].fname|capitalize}}
+                                    {{usersById[task.assignee].lname|upper}}</span>
+                                    {% endif %}
+                                    {% if userid != task.userid %}
+                                    <span class="label label-info">
+                                    Assigned by {{usersById[task.userid].fname|capitalize}}
+                                    {{usersById[task.userid].lname|upper}}</span>
+                                    {% endif %}
+
+                                </p>
+                            </p>
+
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                <!---------- DONE LIST ---------->
+                <div role="tabpanel" class="tab-pane" id="done">
+                    <!--<div>
+                        <a href="javascript:void(0)" class="fr js-delete-history">Delete history</a>
+                        <img class="js-loader" src="img/ajax-loader.gif" style="margin: auto; display: block"/>
+                    </div>-->
+                    <div class="btn-group js-filter" role="group" aria-label="Label" style="margin-bottom: 10px">
+                        <button type="button" class="btn btn-primary js-filter-mine">
+                            {{_t('mine'|capitalize)}} <span class="badge"></span>
+                        </button>
+                        <button type="button" class="btn btn-default js-filter-assigned">
+                            {{_t('theirs'|capitalize)}} <span class="badge"></span>
+                        </button>
+                        <button type="button" class="btn btn-default js-filter-all">
+                            {{_t('everyone'|capitalize)}} <span class="badge"></span>
+                        </button>
+                    </div>
+                    <div class="btn-group js-filter fr" role="group" aria-label="Label" style="margin-bottom: 10px">
+                        <button type="button" class="btn btn-primary js-filter-mine">
+                            {{_t('mine'|capitalize)}} <span class="badge"></span>
+                        </button>
+                        <button type="button" class="btn btn-default js-filter-assigned">
+                            {{_t('theirs'|capitalize)}} <span class="badge"></span>
+                        </button>
+                        <button type="button" class="btn btn-default js-filter-all">
+                            {{_t('everyone'|capitalize)}} <span class="badge"></span>
+                        </button>
+                    </div>
+                    <!----- task template -->
+                    <div style="display: none;" class="js-template">
+                        <div class="list-group" >
+                            <a href="#" class="list-group-item" style="height:57px">
+                                <button taskid="" style="float:right" type="button" class="btn btn-danger"
+                                        onclick="setTaskStatus(this)">Cancel</button>
+                                <h4 class="list-group-item-heading"> </h4>
+                                <p class="list-group-item-text"> </p>
+                            </a>
                         </div>
-                        <!----- end task template -->
                     </div>
+                    <!----- end task template -->
                 </div>
             </div>
         </div>
@@ -171,6 +197,19 @@
             } else {
                 alert("Task status could not be changed!");
             }
+        });
+    }
+
+    function deleteHistory() {
+        $.ajax({
+            url: "/api/tasks/deletedone"
+        }).done(function (res) {
+            if(res.result) {
+                $("#done .list-group:visible").remove();
+            } else {
+                alert("History could not be deleted!");
+            }
+            $(".js-loader").hide();
         });
     }
 
@@ -252,32 +291,38 @@
         var urlDone = '/api/tasks/get/done';
 
         $("[data-toggle='tabajax']").click(function(e) {
-            $("#todo-done .loader").css("display", "block");
+            $("#done .loader").css("display", "block");
             $.get(urlDone, function(data) {
                 if(data.result) {
                     // mask the loader
-                    $("#todo-done .loader").css("display", "none");
+                    $("#done .js-loader").css("display", "none");
                     // empty the list before refresh
-                    $.each($("#done-list").children(), function() {
+                    $.each($("#done .list-group:visible"), function() {
                         if($(this).css("display") != "none") $(this).remove();
                     });
                     var rows = data.data;
-                    var template = $("#done-list div:first");
+                    var template = $("#done .js-template");
                     // populate
                     $.each(rows, function(item){
                         $("button", template).attr("taskid", rows[item].id);
                         $("button", template).attr("action", "new");
                         $("h4", template).text("#" + rows[item].id + " " + rows[item].name);
                         $("p", template).text(rows[item].description);
-                        $("#done-list").append($(template).html());
+                        $("#done").append($(template).html());
                     });
                 } else {
-                    $("#todo-done .loader").css("display", "none");
+                    alert("An error has occured!");
+                    $("#done .js-loader").css("display", "none");
                 }
             });
             $(this).tab('show');
             return false;
         });
+
+        $(".js-delete-history").click(function(){
+            $("#done .js-loader").show();
+            setTimeout(deleteHistory, 1000);
+        })
     });
 </script>
 

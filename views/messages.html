@@ -17,11 +17,24 @@
                 {% for email in emails %}
                 <div class="btn-group" style="display: none">
                     <button type="button" class="btn btn-default js-email" aria-expanded="false" emailaddr="{{email}}">{{email}}</button>
-                    <button class="btn btn-primary" type="button">
-                        <span class="glyphicon glyphicon-remove js-email-remove" aria-hidden="false"></span>
+                    <button class="btn btn-primary js-email-remove" type="button">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="false"></span>
                     </button>
                 </div>
                 {% endfor %}
+                <div class="src">
+                    <input type="text" style="border:none" class="js-filter-user" />
+                    <ul class="dropdown-menu js-users-list" role="menu" style="display:none">
+                        {% for user in users %}
+                        <li>
+                            <a href="#" user="{{user.fname|capitalize}} {{user.lname|capitalize}}" email="{{user.email}}"> </a>
+                        </li>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+
             </div>
             <div class="form-group">
                 <input type="text" class="form-control" id="title" placeholder="Object" name="title" autofocus>
@@ -72,7 +85,7 @@
         });
 
         $( ".js-email-remove" ).click(function(){
-            $(this).parent().parent().hide(300, function(){
+            $(this).parent().hide(300, function(){
                 if($(".js-email:visible").parent().length == 0) {
                     $(".js-all").show();
                 }
@@ -120,11 +133,74 @@
                 $("._loader").hide();
             });
         });
+
+        $(".js-filter-user").keyup(function(event) {
+            console.log(event);
+            // arrow down
+            if(event.keyCode === 40 || event.keyCode === 38) {
+                var increment = 1;
+                if(event.keyCode === 38) {
+                    increment = -1;
+                }
+                console.log("arrow down");
+                var $users = $(".js-users-list li:visible");
+                var nextUser = -1;
+
+                for(var key in $users) {
+                    var $user = $users.eq(key);
+                    if($user.hasClass("selected")) {
+                        $user.removeClass("selected")
+                        nextUser = parseInt(key) + increment;
+                        break;
+                    }
+                }
+
+                if(nextUser === -1) {
+                    $users.first().addClass("selected");
+                } else if(nextUser >= 0 && nextUser < $users.length) {
+                    console.log($users.eq(nextUser));
+                    $users.eq(nextUser).addClass("selected");
+                } else if(nextUser === $users.length) {
+                    $users.last().addClass("selected");
+                }
+            }
+
+            var filter = $(".js-filter-user").val();
+
+            var $usersList = $(".js-users-list");
+
+            if(filter.length === 0) {
+                $usersList.find("li").removeClass("selected");
+                $usersList.hide();
+                return;
+            }
+
+            $usersList.show();
+
+            $.each($usersList.find("li a"), function(k, item){
+                var $item = $(item);
+                var user = $item.attr("user");
+                var regexp = new RegExp(filter, 'i');
+                var indexUser = user.search(regexp);
+                if(indexUser != -1) {
+                    //var regexp = new RegExp("^" + filter, 'gi');
+                    user = user.replace(regexp,"<span style='background-color:#337ab7;color:white'>" +
+                        filter + "</span>");
+                    $item.html(user + "<br />" + "<span style='color:#BBB'>" + $item.attr("email") + "</span>");
+                    $item.parent().show();
+                } else {
+                    $item.parent().hide();
+                }
+            });
+            if($(".js-users-list li:visible").length == 0) $usersList.hide();
+
+        });
     });
 
     function onlyThisEmail() {
         $(".js-email").parent().hide();
-        $(onlyThis).parent().show();
     }
+
+
 </script>
 {% include 'includes/footer.html' %}

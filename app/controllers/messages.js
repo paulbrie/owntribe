@@ -5,13 +5,11 @@ function getUsers(req, res) {
         params  : {}
     };
     req.api.loadResource(req, function(queryResult){
-        var emails = [];
+        var users = [];
         if(queryResult.result) {
-            for(var item in queryResult.data) {
-                emails.push(queryResult.data[item].email);
-            }
+            users = queryResult.data;
         }
-        req._store.emails = emails;
+        req._store.users = users;
         render(req, res);
     });
 }
@@ -19,7 +17,7 @@ function getUsers(req, res) {
 function render(req, res) {
     res.render('messages', {
         h1      : "Messages",
-        emails  : req._store.emails,
+        users  : req._store.users,
         user    : req.session.user
     });
 }

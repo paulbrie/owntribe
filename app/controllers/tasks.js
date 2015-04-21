@@ -119,7 +119,6 @@ function render_done(req, res, tasks) {
 module.exports = function(app) {
     return {
         tasks: function(req, res) {
-            // TODO: @Robert, make it better! :)
             if(!req.session.user.logged) {
                 res.redirect('/login');
             } else {

@@ -21,8 +21,9 @@ var tasks = {
         }
 
 
-        var sql =   "SELECT * FROM tasks WHERE status = " + status +
-                    " and (assignee = " + req.session.user.id + " OR " +
+        var sql =   "SELECT * FROM tasks WHERE status = " + status + " AND " +
+                    "valid = 1 AND " +
+                    "(assignee = " + req.session.user.id + " OR " +
                     " userid = " + req.session.user.id + ") order by id desc";
 
         db.query(sql, function(err, rows, fields) {
@@ -102,6 +103,20 @@ var tasks = {
             }
             callback({result:result});
         });
+    },
+    deleteDone: function(callback, params, req){
+        var sql = 'UPDATE tasks SET valid = 0 WHERE status = 1 AND ' +
+            'userid = ' + req.session.user.id;
+            console.log("###############", sql);
+
+        db.query(sql, function(err) {
+                if(err) {
+                    console.log("models/tasks/deleteDone", err);
+                    callback({result: false, msg: "A model error has occurred"});
+                } else {
+                    callback({result: true});
+                }
+            });
     },
     setStatus: function(callback, params, req){
         var status = 1;

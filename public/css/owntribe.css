@@ -1,0 +1,19 @@
+.fr {
+    float:right;
+}
+
+.fl {
+    float:left;
+}
+.src {
+    display: inline;
+    position: relative;
+    vertical-align: middle;
+    height: 34px;
+    line-height: 34px;
+    border: none;
+}
+
+.selected {
+    background-color: #ddd;
+}
