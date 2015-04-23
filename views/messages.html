@@ -5,45 +5,30 @@
     <div class="starter-template">
         <div class="alert alert-success _notification" role="alert" style="float:right;display:none">Your email has been sent!</div>
         <h1>{{h1}}</h1>
-        <form method="post" class="_messages">
-            <div class="form-group" style="line-height: 3em">
-                <strong>{{_t('to :')|capitalize}}</strong>
-                <div class="btn-group js-all">
-                    <button type="button" class="btn btn-default" aria-expanded="false">All <span class="badge"></span></button>
-                    <button class="btn btn-primary _emails" type="button">
-                        <span class="glyphicon glyphicon-edit" aria-hidden="false"></span>
-                    </button>
-                </div>
-                {% for email in emails %}
-                <div class="btn-group" style="display: none">
-                    <button type="button" class="btn btn-default js-email" aria-expanded="false" emailaddr="{{email}}">{{email}}</button>
-                    <button class="btn btn-primary js-email-remove" type="button">
-                        <span class="glyphicon glyphicon-remove" aria-hidden="false"></span>
-                    </button>
-                </div>
-                {% endfor %}
-                <div class="src">
-                    <input type="text" style="border:none" class="js-filter-user" />
-                    <ul class="dropdown-menu js-users-list" role="menu" style="display:none">
-                        {% for user in users %}
-                        <li>
-                            <a href="#" user="{{user.fname|capitalize}} {{user.lname|capitalize}}" email="{{user.email}}"> </a>
-                        </li>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-
-
+        <div  class="js-to">
+            <strong>{{_t('to :')|capitalize}}</strong>
+            <div class="src">
+                <ul class="dropdown-menu js-users-list" role="menu" style="display:none">
+                    {% for user in users %}
+                    <li>
+                        <a href="#" name="{{user.fname|capitalize}} {{user.lname|capitalize}}" email="{{user.email}}"> </a>
+                    </li>
+                    {% endfor %}
+                </ul>
             </div>
+            <input type="text" class="filter js-filter-user" tabindex="1"
+                   placeholder="add a user"/><span class="ml5">or</span> <button class="btn btn-primary js-add-all">Add all <span class="badge">{{users.length}}</span></button>
+
+        </div>
+        <form method="post" class="js-messages">
             <div class="form-group">
-                <input type="text" class="form-control" id="title" placeholder="Object" name="title" autofocus>
+                <input type="text" class="form-control" id="title" placeholder="Object" name="title" autofocus tabindex="2">
             </div>
             <div class="checkbox">
-                <textarea id="message_body" class="form-control" rows="3" placeholder="message"></textarea>
+                <textarea id="message_body" class="form-control" rows="3" placeholder="message" tabindex="3"></textarea>
             </div>
-            <button type="submit" class="btn btn-default">Submit</button>
-            <img class="_loader" src="img/ajax-loader.gif" style="display:none" />
+            <button type="submit" class="btn btn-default" tabindex="4">Submit</button>
+            <img class="js-loader" src="img/ajax-loader.gif" style="display:none" />
         </form>
         <div id="myModal" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-sm">
@@ -66,17 +51,17 @@
 </div>
 {% include 'includes/footer_scripts.html' %}
 <script type="text/javascript">
-    // select one single email
-    var onlyThis;
+
     $(document).ready(function(){
         // init the view
-        $("._loader").hide();
+        $(".js-loader").hide();
 
-        $( "form._messages" ).submit(function( event ) {
+        Users.init();
+
+        // form: prevent default
+        $( "form.js_messages" ).submit(function( event ) {
             event.preventDefault();
         });
-
-        $( ".js-all .badge" ).text($(".js-email").length);
 
         // events
         $( ".js-all" ).click(function(){
@@ -84,21 +69,23 @@
             $(".js-email").parent().show();
         });
 
-        $( ".js-email-remove" ).click(function(){
-            $(this).parent().hide(300, function(){
-                if($(".js-email:visible").parent().length == 0) {
-                    $(".js-all").show();
-                }
+        $(".js-to").on("click",".btn-group button.js-delete-email", function(){
+            Users.deleteUser($(this).parent());
+        });
+
+        $(".js-users-list").on("click","li", function(){
+            $user = $("a", this);
+            Users.addUser({
+                email:$user.attr("email"),
+                name:$user.attr("name")
             });
         });
 
-        $( ".js-email" ).click(function(){
-            onlyThis = this;
-            $('#myModal').modal('show');
-            $('#myModal .modal-body p').html("Select <strong><a href='javascript:void(0);'> " + $(this).attr("emailaddr") + "</a></strong>?");
+        $("button[type='submit']").click(function(){
+            return false;
         });
 
-        $( "button[type='submit']" ).click(function(){
+        $("button[type='submit']").click(function(){
             $("._loader").show();
             var emails = [];
             var selector = ".js-email";
@@ -136,16 +123,23 @@
 
         $(".js-filter-user").keyup(function(event) {
             console.log(event);
-            // arrow down
+            if(event.keyCode === 8) {
+                Users.deleteUser($(".js-to .js-user").last());
+            }
+            /** ----- arrow up or arrow down ----- */
             if(event.keyCode === 40 || event.keyCode === 38) {
+                // set direction
                 var increment = 1;
                 if(event.keyCode === 38) {
                     increment = -1;
                 }
-                console.log("arrow down");
+
+                // get the users corresponding to the filter
                 var $users = $(".js-users-list li:visible");
+                // by default we consider that no user is selected
                 var nextUser = -1;
 
+                // detect if a selection already exists
                 for(var key in $users) {
                     var $user = $users.eq(key);
                     if($user.hasClass("selected")) {
@@ -155,6 +149,7 @@
                     }
                 }
 
+                // move selection
                 if(nextUser === -1) {
                     $users.first().addClass("selected");
                 } else if(nextUser >= 0 && nextUser < $users.length) {
@@ -165,13 +160,27 @@
                 }
             }
 
+            /** ----- return ----- */
+            if(event.keyCode === 13) {
+                // get the selected user
+                var $selected = $(".js-users-list li.selected a");
+                if($selected.length == 1) {
+                    Users.addUser({
+                        email: $selected.attr("email"),
+                        name : $selected.attr("name")
+                    });
+                    //$(".js-filter-user").val("");
+                }
+            }
+
+            /** ----- other keys ----- */
             var filter = $(".js-filter-user").val();
 
             var $usersList = $(".js-users-list");
 
             if(filter.length === 0) {
                 $usersList.find("li").removeClass("selected");
-                $usersList.hide();
+                Users.hideUsersList();
                 return;
             }
 
@@ -179,7 +188,7 @@
 
             $.each($usersList.find("li a"), function(k, item){
                 var $item = $(item);
-                var user = $item.attr("user");
+                var user = $item.attr("name");
                 var regexp = new RegExp(filter, 'i');
                 var indexUser = user.search(regexp);
                 if(indexUser != -1) {
@@ -197,10 +206,60 @@
         });
     });
 
-    function onlyThisEmail() {
-        $(".js-email").parent().hide();
+    /**
+     * adds a user in the to section
+     * @param user
+     */
+
+    var Users = {
+        users: [{% for user in users %}
+            {email:'{{user.email}}',fname:'{{user.fname}}',lname:'{{user.lname}}'},{% endfor %}
+        ],
+        addedUsers: {},
+        init: function() {
+        // by default set the focus on the search input
+            $(".js-filter-user").focus();
+            $(".js-add-all").click(function(){Users.addAll()});
+        },
+        addUser: function addUser(user) {
+            if(!this.addedUsers[user.email]) {
+                this.addedUsers[user.email] = true;
+                this.hideUsersList();
+                if($(".js-to div[email='" + user.email + "']").length === 1)
+                    return;
+                $('<div class="btn-group mr5 js-user" email="' + user.email + '">' +
+                '<button type="button" class="btn btn-default" aria-expanded="false">' + user.name + '</button>' +
+                '<button class="btn btn-primary js-delete-email" type="button">' +
+                '<span class="glyphicon glyphicon-remove" aria-hidden="false"></span>' +
+                '</button>' +
+                '</div>').insertBefore($('.src'));
+            } else {
+                // TODO: show tooltip notification
+            }
+        },
+        deleteUser: function (element) {
+            var email = $(element).attr("email");
+            delete this.addedUsers[email];
+            $(element).hide(300, function(){
+                $(this).remove();
+            });
+            $(".js-filter-user").focus();
+        },
+        addAll: function() {
+            for (var key in this.users) {
+                this.addUser({
+                    email: this.users[key].email,
+                    name: this.users[key].fname + " " + this.users[key].lname
+                });
+            }
+            $(".js-filter-user").focus();
+        },
+        hideUsersList: function() {
+            // empty filter, reset user selection, hide the list
+            $(".js-filter-user").val("");
+            $(".js-users-list li").removeClass("selected");
+            $(".js-users-list").hide();
+        }
     }
-
-
 </script>
 {% include 'includes/footer.html' %}

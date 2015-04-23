@@ -7,13 +7,35 @@
 }
 .src {
     display: inline;
-    position: relative;
+    position: absolute;
     vertical-align: middle;
     height: 34px;
     line-height: 34px;
     border: none;
 }
 
+.filter {
+    display: inline-block;
+    border: none;
+    outline: 0;
+    margin: 5px;
+    width: 100px;
+}
+
+.js-to {
+    border-bottom: solid 1px #ccc;
+    padding:5px;
+    margin-bottom: 5px;
+}
+
 .selected {
     background-color: #ddd;
+}
+
+.ml5 {
+    margin-left: 5px;
+}
+
+.mr5 {
+    margin-left: 5px;
 }
