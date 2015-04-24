@@ -5,24 +5,24 @@
     <div class="starter-template">
         <div class="alert alert-success _notification" role="alert" style="float:right;display:none">Your email has been sent!</div>
         <h1>{{h1}}</h1>
-        <div  class="js-to">
-            <strong>{{_t('to :')|capitalize}}</strong>
-            <div class="src">
-                <ul class="dropdown-menu js-users-list" role="menu" style="display:none">
-                    {% for user in users %}
-                    <li>
-                        <a href="#" name="{{user.fname|capitalize}} {{user.lname|capitalize}}" email="{{user.email}}"> </a>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div>
-            <input type="text" class="filter js-filter-user" tabindex="1"
-                   placeholder="add a user"/><span class="ml5">or</span> <button class="btn btn-primary js-add-all">Add all <span class="badge">{{users.length}}</span></button>
+        <form method="post" class="js-messages" onsubmit="return false">
+            <div  class="js-to">
+                <strong>{{_t('to :')|capitalize}}</strong>
+                <div class="src">
+                    <ul class="dropdown-menu js-users-list" role="menu" style="display:none">
+                        {% for user in users %}
+                        <li>
+                            <a href="#" name="{{user.fname|capitalize}} {{user.lname|capitalize}}" email="{{user.email}}"> </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <input type="text" class="filter js-filter-user" tabindex="1"
+                       placeholder="add a user" autofocus/><span class="ml5">or</span> <a class="btn btn-primary js-add-all">Add all <span class="badge">{{users.length}}</span></a>
 
-        </div>
-        <form method="post" class="js-messages">
+            </div>
             <div class="form-group">
-                <input type="text" class="form-control" id="title" placeholder="Object" name="title" autofocus tabindex="2">
+                <input type="text" class="form-control" id="title" placeholder="Object" name="title"  tabindex="2">
             </div>
             <div class="checkbox">
                 <textarea id="message_body" class="form-control" rows="3" placeholder="message" tabindex="3"></textarea>
@@ -59,8 +59,9 @@
         Users.init();
 
         // form: prevent default
-        $( "form.js_messages" ).submit(function( event ) {
+        $( "form.js_messages" ).submit(function(event) {
             event.preventDefault();
+            return false;
         });
 
         // events
@@ -82,47 +83,45 @@
         });
 
         $("button[type='submit']").click(function(){
-            return false;
-        });
-
-        $("button[type='submit']").click(function(){
             $("._loader").show();
             var emails = [];
-            var selector = ".js-email";
-            if($(".js-all:visible").length == 0) {
-                selector += ":visible";
+            $.each($(".js-user:visible"), function(key, div){
+                console.log(div);
+                emails.push($(div).attr('email'));
+            });
+
+            if(emails.length > 0) {
+                $.ajax({
+                    url: "/api/messages/send",
+                    data: {
+                        title: $("#title").val(),
+                        body: $("textarea").val(),
+                        emails: emails.join(",")
+                    },
+                    method: "POST"
+                }).done(function (res) {
+                    console.log(res);
+                    if(res.result) {
+                        $("._notification").show();
+                        setTimeout('$("._notification").hide()', 2000);
+                        $("#title").val("");
+                        $("textarea").val("");
+                        $(".js-user").hide(100);
+
+                    } else {
+
+                    }
+                    $("._loader").hide();
+                });
+            } else {
+                //TODO: display empty list message
             }
-            $.each($(selector), function(key, div){
-                emails.push($(div).attr('emailaddr'));
-            });
-            console.log(emails);
-            $.ajax({
-                url: "/api/messages/send",
-                data: {
-                    title: $("#title").val(),
-                    body: $("textarea").val(),
-                    emails: emails.join(",")
-                },
-                method: "POST"
-            }).done(function (res) {
-                console.log(res);
-                if(res.result) {
-                    $("._notification").show();
-                    setTimeout('$("._notification").hide()', 2000);
-                    $("#title").val("");
-                    $("textarea").val("");
-                    $(".js-all").show();
-                    $(".js-email").parent().hide();
-
-                } else {
-
-                }
-                $("._loader").hide();
-            });
+            return false;
         });
 
         $(".js-filter-user").keyup(function(event) {
             console.log(event);
+            /** ----- backspace ----- */
             if(event.keyCode === 8) {
                 Users.deleteUser($(".js-to .js-user").last());
             }
@@ -169,7 +168,6 @@
                         email: $selected.attr("email"),
                         name : $selected.attr("name")
                     });
-                    //$(".js-filter-user").val("");
                 }
             }
 
@@ -212,9 +210,7 @@
      */
 
     var Users = {
-        users: [{% for user in users %}
-            {email:'{{user.email}}',fname:'{{user.fname}}',lname:'{{user.lname}}'},{% endfor %}
-        ],
+        users: [],
         addedUsers: {},
         init: function() {
         // by default set the focus on the search input
@@ -240,7 +236,7 @@
         deleteUser: function (element) {
             var email = $(element).attr("email");
             delete this.addedUsers[email];
-            $(element).hide(300, function(){
+            $(element).hide(100, function(){
                 $(this).remove();
             });
             $(".js-filter-user").focus();
@@ -261,5 +257,9 @@
             $(".js-users-list").hide();
         }
     }
+
+    Users.users = [{% for user in users %}
+    {email:'{{user.email}}',fname:'{{user.fname}}',lname:'{{user.lname}}'},{% endfor %}];
+
 </script>
 {% include 'includes/footer.html' %}
