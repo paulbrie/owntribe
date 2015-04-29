@@ -100,7 +100,7 @@ var dictionary = {
         authenticated: false
     },
     users_get: {
-        expose: false,
+        expose: true,
         model: 'users',
         method: 'get',
         params: {
@@ -109,7 +109,7 @@ var dictionary = {
                 required: false
             }
         },
-        authenticated: true
+        authenticated: false
     },
     // ----- TIMELINE -----
     timeline_add: {

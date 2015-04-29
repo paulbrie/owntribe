@@ -4,7 +4,9 @@ var users = {
     get: function(callback, params, req) {
         var getAllUsers = true;
         var sql = 'SELECT * FROM users order by fname, lname';
-        if(req.internalCall.params && req.internalCall.params.userid) {
+        if( req.internalCall &&
+            req.internalCall.params &&
+            req.internalCall.params.userid) {
             getAllUsers = false;
             sql = 'SELECT * FROM users where id = ' + req.internalCall.params.userid;
         }
