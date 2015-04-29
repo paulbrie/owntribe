@@ -73,8 +73,8 @@ settings.get(function(result){
 
         global.tribeSettings = settings;
 
-        app.listen(parseInt(settings.server.port), function (){
-            console.log("Server started on " + settings.server.url);
+        app.listen(parseInt(settings.server.nodejsPort), function (){
+            console.log("Server started on " + settings.server.nodejsUrl);
         });
 
     } else {

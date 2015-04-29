@@ -84,8 +84,8 @@ var tasks = {
                                 html: "<p>A new task has been assigned to you by " + userName + "</p><hr />" +
                                 "<strong>" + utils.ucfirst(task.name) + "</strong>" +
                                 "<p>" + task.description + "</p><hr />" +
-                                "<a href='" + global.tribeSettings.server.protocol + "://" +
-                                global.tribeSettings.server.url + ":" + global.tribeSettings.server.port +
+                                "<a href='" + global.tribeSettings.server.publicProtocol + "://" +
+                                global.tribeSettings.server.publicUrl + ":" + global.tribeSettings.server.publicPort +
                                 "/tasks'>Click here to access your tasks!</a>" +
                                 "<p style='color: orangered'><a href='https://github.com/paulbrie/owntribe/' style='color:'>" +
                                 "Create your own tribe and get in control of your digital life!</a>"
