@@ -7,6 +7,18 @@ function intval(val) {
  * for example tasks_get maps /api/tasks/get with the model tasks and the method getTasks
  */
 var dictionary = {
+    files_add: {
+        expose: true,
+        model: 'files',
+        method: 'add',
+        params: {
+            filesselect: {
+                constraint: ".+",
+                required: true
+            }
+        },
+        authenticated: true
+    },
     messages_send: {
         expose: true,
         model: 'messages',

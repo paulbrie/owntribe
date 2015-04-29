@@ -2,6 +2,7 @@
 
 // variables
 var express     = require('express');
+var multer      = require('multer');
 var session     = require('express-session');
 var mysql       = require('mysql');
 var swig        = require('swig');
@@ -15,6 +16,8 @@ var timer       = require('./app/libraries/timer');
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
 }));
+
+app.use(multer({ dest: './data/files/tmp'}));
 
 app.engine('html', swig.renderFile);
 app.set('views', __dirname + '/views');

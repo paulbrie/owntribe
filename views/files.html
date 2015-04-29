@@ -1,0 +1,57 @@
+{% include 'includes/header.html' %}
+{% include 'includes/menu.html' %}
+<div class="container">
+    <div class="starter-template">
+        <h1>{{h1}}</h1>
+        <form id="file-form" action="/api/files/upload" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <input id="file-select" type="file" id="fileselect" name="fileselect[]" multiple="multiple" />
+                <div id="filedrag">or drop files here</div>
+            </div>
+
+            <button id="upload-button" type="submit" class="btn btn-default">Upload</button>
+        </form>
+    </div>
+    <script type="text/javascript">
+        var form = document.getElementById('file-form');
+        var fileSelect = document.getElementById('file-select');
+        var uploadButton = document.getElementById('upload-button');
+
+        form.onsubmit = function(event) {
+            event.preventDefault();
+
+            // Update button text.
+            uploadButton.innerHTML = 'Uploading...';
+
+            var files = fileSelect.files;
+            var formData = new FormData();
+
+            // Loop through each of the selected files.
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                // Add the file to the request.
+                formData.append('filesselect[]', file, file.name);
+            }
+
+            // Set up the request.
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'api/files/add', true);
+
+            // Set up a handler for when the request finishes.
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    // File(s) uploaded.
+                    uploadButton.innerHTML = 'Upload';
+                } else {
+                    console.log(xhr);
+                    alert('An error occurred!');
+                }
+            };
+
+            // Send the Data.
+            xhr.send(formData);
+        }
+    </script>
+</div>
+{% include 'includes/footer_scripts.html' %}
+{% include 'includes/footer.html' %}
