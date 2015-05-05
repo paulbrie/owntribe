@@ -50,8 +50,12 @@
             fileElem.click();
         });
 
-        function handleFiles(fileSelect) {
+        fileElem.addEventListener("change", function(event) {
+            handleFiles(fileElem);
+        });
 
+        function handleFiles(fileSelect) {
+            console.log()
             // Update button text.
             uploadButton.innerHTML = 'Uploading...';
 
