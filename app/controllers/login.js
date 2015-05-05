@@ -1,7 +1,6 @@
 var pipe = require('../libraries/smartpipe')();
 
 function login(req, res) {
-    console.log('login');
     var users_model = require('../models/users');
     users_model.login(function(result){
         pipe.next(req, res);

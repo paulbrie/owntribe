@@ -3,55 +3,91 @@
 <div class="container">
     <div class="starter-template">
         <h1>{{h1}}</h1>
-        <form id="file-form" action="/api/files/upload" method="post" enctype="multipart/form-data">
-            <div class="form-group">
-                <input id="file-select" type="file" id="fileselect" name="fileselect[]" multiple="multiple" />
-                <div id="filedrag">or drop files here</div>
-            </div>
+        <input type="file" id="fileElem" multiple style="display:none" onchange="handleFiles(this.files)">
+        <div id="fileList">
+            <p>No files selected!</p>
+        </div>
+        <button id="upload-button" type="submit" class="btn btn-default">Select some files</button>
+        <h2>Files</h2>
+        <table id="files" class="table .table-condensed .table-hover">
 
-            <button id="upload-button" type="submit" class="btn btn-default">Upload</button>
-        </form>
+        </table>
     </div>
+    {% include 'includes/footer_scripts.html' %}
     <script type="text/javascript">
-        var form = document.getElementById('file-form');
-        var fileSelect = document.getElementById('file-select');
-        var uploadButton = document.getElementById('upload-button');
+        $(document).ready(function(){
+            loadFiles();
+        });
 
-        form.onsubmit = function(event) {
-            event.preventDefault();
+        function loadFiles() {
+            $.ajax({
+                url: "api/files/get",
+                success: function(result){
+                    if(result.result) {
+                        $("#files").children().remove();
+                        for(var file in result.data) {
+                            $("#files").append("<tr>" +
+                            "<td><a href='files/download/" + result.data[file].id +"/"+
+                            result.data[file].name + "'>"+result.data[file].name+"</a></td>" +
+                            "<td class='ar'>"+ result.data[file].size+"</td>" +
+                            "<td class='ar'>"+ result.data[file].mimetype+"</td>" +
+                            "<td class='ar'>"+ result.data[file].created+"</td>" +
+                            "</tr>");
+                        }
+                    } else {
+                        // TODO: error message/action
+                    }
+                },
+                error: function(result) {
+                    console.log(result);
+                }
+            });
+        }
+
+        var uploadButton = document.getElementById("upload-button");
+        var fileElem = document.getElementById("fileElem");
+        uploadButton.addEventListener("click", function(event){
+            fileElem.click();
+        });
+
+        function handleFiles(fileSelect) {
 
             // Update button text.
             uploadButton.innerHTML = 'Uploading...';
 
-            var files = fileSelect.files;
-            var formData = new FormData();
+            if(fileSelect.files && fileSelect.files.length > 0) {
+                var files = fileSelect.files;
+                var formData = new FormData();
 
-            // Loop through each of the selected files.
-            for (var i = 0; i < files.length; i++) {
-                var file = files[i];
-                // Add the file to the request.
-                formData.append('filesselect[]', file, file.name);
-            }
-
-            // Set up the request.
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', 'api/files/add', true);
-
-            // Set up a handler for when the request finishes.
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    // File(s) uploaded.
-                    uploadButton.innerHTML = 'Upload';
-                } else {
-                    console.log(xhr);
-                    alert('An error occurred!');
+                // Loop through each of the selected files.
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+                    // Add the file to the request.
+                    formData.append('filesselect[]', file, file.name);
                 }
-            };
 
-            // Send the Data.
-            xhr.send(formData);
+
+                // Set up the request.
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'api/files/add', true);
+
+                // Set up a handler for when the request finishes.
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        // File(s) uploaded.
+                        uploadButton.innerHTML = 'Upload';
+                        loadFiles();
+                        delete fileSelect.files;
+                    } else {
+                        console.log(xhr);
+                        alert('An error occurred!');
+                    }
+                };
+
+                // Send the Data.
+                xhr.send(formData);
+            }
         }
     </script>
 </div>
-{% include 'includes/footer_scripts.html' %}
 {% include 'includes/footer.html' %}

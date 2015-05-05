@@ -11,6 +11,8 @@ module.exports = function(app) {
     app.get('/contribute', common.indexPage);
     app.get('/login', login.index);
     app.get('/files', files.index);
+    app.get('/files/download/:id/:name', files.download);
+
 
     app.get('/messages', messages.indexPage);
     app.get('/newsletter', common.indexPage);

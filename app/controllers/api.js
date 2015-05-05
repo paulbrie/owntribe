@@ -19,6 +19,24 @@ var dictionary = {
         },
         authenticated: true
     },
+    files_get: {
+        expose: true,
+        model: 'files',
+        method: 'get',
+        authenticated: true
+    },
+    files_download: {
+        expose: true,
+        model: 'files',
+        method: 'download',
+        params: {
+            fileid: {
+                constraint: ".+",
+                required: true
+            }
+        },
+        authenticated: true
+    },
     messages_send: {
         expose: true,
         model: 'messages',
@@ -162,6 +180,7 @@ function loadResource(req, callback) {
     }
     console.log("------- resource/call -------\n", "       " + resource + "/" + method);
     console.log("------- externalParams -------\n", externalParams);
+    console.log("------- callback -------\n", callback);
 
 
     var endpoint = dictionary[resource + "_" + method];
