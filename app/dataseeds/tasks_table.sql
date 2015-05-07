@@ -41,7 +41,6 @@ INSERT INTO `tasks` (`id`, `name`, `description`, `status`, `user_id`) VALUES
 -- Index pour les tables exportées
 --
 
---
 -- Index pour la table `tasks`
 --
 ALTER TABLE `tasks`
@@ -55,4 +54,4 @@ ALTER TABLE `tasks`
 -- AUTO_INCREMENT pour la table `tasks`
 --
 ALTER TABLE `tasks`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=48;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;

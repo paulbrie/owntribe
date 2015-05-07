@@ -3,7 +3,7 @@ var fs = require('fs');
 var files = {
     add: function(callback, params, req) {
         try {
-            var file = req.files["filesselect[]"];
+            var file = req.files["filesselect"];
 
             // if multiple files are sent, take the first only
             if(typeof file === "array") file = file[0];
@@ -20,8 +20,6 @@ var files = {
                 } else {
                     callback({result: false});
                 }
-
-
             });
         } catch (err) {
             console.log(file, "----", err);

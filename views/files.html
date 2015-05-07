@@ -8,6 +8,7 @@
             <p>No files selected!</p>
         </div>
         <button id="upload-button" type="submit" class="btn btn-default">Select some files</button>
+        <div class="progress-wrapper"></div>
         <h2>Files</h2>
         <table id="files" class="table .table-condensed .table-hover">
 
@@ -46,6 +47,7 @@
 
         var uploadButton = document.getElementById("upload-button");
         var fileElem = document.getElementById("fileElem");
+
         uploadButton.addEventListener("click", function(event){
             fileElem.click();
         });
@@ -55,43 +57,75 @@
         });
 
         function handleFiles(fileSelect) {
-            console.log()
             // Update button text.
             uploadButton.innerHTML = 'Uploading...';
 
             if(fileSelect.files && fileSelect.files.length > 0) {
                 var files = fileSelect.files;
-                var formData = new FormData();
 
                 // Loop through each of the selected files.
                 for (var i = 0; i < files.length; i++) {
                     var file = files[i];
                     // Add the file to the request.
-                    formData.append('filesselect[]', file, file.name);
+                    sendFormFile(file);
                 }
-
-
-                // Set up the request.
-                var xhr = new XMLHttpRequest();
-                xhr.open('POST', 'api/files/add', true);
-
-                // Set up a handler for when the request finishes.
-                xhr.onload = function () {
-                    if (xhr.status === 200) {
-                        // File(s) uploaded.
-                        uploadButton.innerHTML = 'Upload';
-                        loadFiles();
-                        delete fileSelect.files;
-                    } else {
-                        console.log(xhr);
-                        alert('An error occurred!');
-                    }
-                };
-
-                // Send the Data.
-                xhr.send(formData);
             }
+        }
+
+        function sendFormFile(file) {
+            var formData = new FormData();
+            // Set up the request.
+            formData.append('filesselect', file, file.name);
+
+            //add progress-bar ui
+            $('.progress-wrapper').append('' +
+                '<div class="progress">' +
+                    '<div class="progress-bar" file-name="'+file.name+'" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>' +
+                '</div>'
+            );
+
+            var xhr = new XMLHttpRequest();
+            xhr.addEventListener("progress", function(event) {
+                updateProgress(event, file)
+            }, false);
+
+            xhr.addEventListener("load", function(event){
+                    transferComplete(event, file);
+            },false);
+
+            xhr.open('POST', 'api/files/add', true);
+
+            // Set up a handler for when the request finishes.
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    // File(s) uploaded.
+                    uploadButton.innerHTML = 'Upload';
+                    loadFiles();
+//                    delete filesselect.files;
+                } else {
+                    console.log(xhr);
+                    alert('An error occurred!');
+                }
+            };
+
+            // Send the Data.
+            xhr.send(formData);
+        }
+
+        // progress on transfers from the server to the client (downloads)
+        function updateProgress (event, file) {
+            if (event.lengthComputable) {
+                var percentComplete = event.loaded / event.total * 100;
+                $('.progress-bar[file-name="'+file.name+'"]').width(percentComplete+'%');
+            } else {
+                // Unable to compute progress information since the total size is unknown
+            }
+        }
+
+        function transferComplete(event, file) {
+            $('<p>'+file.name+'</p>').insertAfter($('.progress-bar[file-name="'+file.name+'"]').closest(".progress"));
+//            $('.progress-wrapper').append('<p>'+file.name+'</p>')
         }
     </script>
 </div>
-{% include 'includes/footer.html' %}
+{% include 'includes/footer.html' %} 

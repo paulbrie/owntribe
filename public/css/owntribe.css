@@ -39,3 +39,11 @@
 .mr5 {
     margin-left: 5px;
 }
+
+.progress-wrapper {
+  padding: 5px 0;
+}
+
+.progress-wrapper .progress {
+  margin-bottom: 5px;
+}
