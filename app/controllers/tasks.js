@@ -85,9 +85,7 @@ function render(req, res, tasks) {
     for(var user in req._store.users) {
         usersById[req._store.users[user].id] = req._store.users[user];
     }
-    var task = req._store.tasks[0];
-    
-    
+
     res.render('tasks', {
         title: 'Owntribe',
         h1: 'Tasks',

@@ -77,21 +77,25 @@
             // Set up the request.
             formData.append('filesselect', file, file.name);
 
+            var stringFileName = file.name + Math.floor(Date.now() / 1000);
+            file.hash = stringFileName.hashCode();
+
             //add progress-bar ui
             $('.progress-wrapper').append('' +
                 '<div class="progress">' +
-                    '<div class="progress-bar" file-name="'+file.name+'" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>' +
+                    '<div class="progress-bar" file-name="'+file.hash+'" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>' +
                 '</div>'
             );
 
             var xhr = new XMLHttpRequest();
-            xhr.addEventListener("progress", function(event) {
-                updateProgress(event, file)
-            }, false);
 
-            xhr.addEventListener("load", function(event){
-                    transferComplete(event, file);
-            },false);
+            xhr.upload.onprogress = (function(event) {
+                updateProgress(event, file)
+            });
+
+            xhr.upload.onloadend = (function(event){
+                transferComplete(event, file);
+            });
 
             xhr.open('POST', 'api/files/add', true);
 
@@ -116,15 +120,26 @@
         function updateProgress (event, file) {
             if (event.lengthComputable) {
                 var percentComplete = event.loaded / event.total * 100;
-                $('.progress-bar[file-name="'+file.name+'"]').width(percentComplete+'%');
+                $('.progress-bar[file-name="'+file.hash+'"]').width(percentComplete+'%');
             } else {
                 // Unable to compute progress information since the total size is unknown
             }
         }
 
         function transferComplete(event, file) {
-            $('<p>'+file.name+'</p>').insertAfter($('.progress-bar[file-name="'+file.name+'"]').closest(".progress"));
+            $('<p>'+file.name+'</p>').insertAfter($('.progress-bar[file-name="'+file.hash+'"]').closest(".progress"));
 //            $('.progress-wrapper').append('<p>'+file.name+'</p>')
+        }
+
+        String.prototype.hashCode = function(){
+            var hash = 0;
+            if (this.length == 0) return hash;
+            for (i = 0; i < this.length; i++) {
+                char = this.charCodeAt(i);
+                hash = ((hash<<5)-hash)+char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return hash;
         }
     </script>
 </div>
