@@ -8,7 +8,15 @@
         <div class="progress-wrapper"></div>
         <br>
         <table id="files" class="table .table-condensed .table-hover">
-
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Size</th>
+                    <th>Kind</th>
+                    <th>Creation date</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
         </table>
     </div>
     {% include 'includes/footer_scripts.html' %}
@@ -21,19 +29,25 @@
             $.ajax({
                 url: "api/files/get",
                 success: function(result){
+                    console.log(result);
                     if(result.result) {
-                        $("#files").children().remove();
-                        for(var file in result.data) {
-                            $("#files").append("<tr>" +
-                            "<td><a href='files/download/" + result.data[file].id +"/"+
-                            result.data[file].name + "'>"+result.data[file].name+"</a></td>" +
-                            "<td class='ar'>"+ result.data[file].size+"</td>" +
-                            "<td class='ar'>"+ result.data[file].mimetype+"</td>" +
-                            "<td class='ar'>"+ result.data[file].created+"</td>" +
-                            "</tr>");
+                        $("#files tbody").children().remove();
+                        if (result.data.length != 0) {
+                            for(var file in result.data) {
+                                $("#files tbody").append("<tr>" +
+                                        "<td><a href='files/download/" + result.data[file].id +"/"+
+                                        result.data[file].name + "'>"+result.data[file].name+"</a></td>" +
+                                        "<td class='ar'>"+ result.data[file].size+"</td>" +
+                                        "<td class='ar'>"+ result.data[file].mimetype+"</td>" +
+                                        "<td class='ar'>"+ result.data[file].created+"</td>" +
+                                        "</tr>");
+                            }
+                        } else {
+                            $("#files tbody").append("<h3>This folder is empty</h3>" +
+                                    "<p>Hit Select files to upload your files</p>");
                         }
                     } else {
-                        // TODO: error message/action
+                        //ops api error
                     }
                 },
                 error: function(result) {
@@ -58,23 +72,23 @@
                 // Update button text.
                 uploadButton.innerHTML = 'Uploading...';
                 var files = fileSelect.files;
-                    filesNr = files.length;
+                var filesNr = files.length;
+                var count = 0;
                 // Loop through each of the selected files.
                 for (var i = 0; i < filesNr; i++) {
-                    (function(i) {
-                        var file = files[i];
-                        // Add the file to the request.
-                        sendFormFile(file, i, filesNr, function(i, nr){
-                            if (i == nr-1) {
-                                uploadButton.innerHTML = 'Select files';
-                            }
-                        });
-                    })(i);
+                    var file = files[i];
+                    // Add the file to the request.
+                    sendFormFile(file, function() {
+                        count++;
+                        if  (count == filesNr) {
+                            uploadButton.innerHTML = 'Select files';
+                        }
+                    });
                 }
             }
         }
 
-        function sendFormFile(file, i, fileNr, callBack) {
+        function sendFormFile(file, callback) {
             var formData = new FormData();
             // Set up the request.
             formData.append('filesselect', file, file.name);
@@ -96,10 +110,9 @@
             });
 
             xhr.upload.onloadend = (function(event){
-                transferComplete(event, file);
-                setTimeout(function(){
-                    callBack(i, fileNr);
-                }, 3000);
+                transferComplete(event, file, function(){
+                    callback();
+               });
             });
 
             xhr.open('POST', 'api/files/add', true);
@@ -130,9 +143,10 @@
             }
         }
 
-        function transferComplete(event, file) {
+        function transferComplete(event, file, callback) {
             setTimeout(function(){
                 $('.progress-bar[file-name="'+file.hash+'"]').parent().hide(1000).remove();
+                callback();
             }, 1500);
         }
 
