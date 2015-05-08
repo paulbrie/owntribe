@@ -5,7 +5,7 @@ function render(req, res) {
     console.log(files);
 
     res.render('files', {
-        h1  : "Files",
+        h1  : "My Files",
         user: req.session.user,
         files: files
     });
