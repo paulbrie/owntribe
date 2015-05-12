@@ -1,8 +1,13 @@
 var fs = require("fs");
 function render(req, res) {
-
-    var files = fs.readdirSync("./data/files/");
-    console.log(files);
+    var files = fs.readdir("./data/files/", function(err, files){
+        if (err) {
+            console.log(err);
+            return false;
+        } else {
+            return files;
+        }
+    });
 
     res.render('files', {
         h1  : "My Files",
@@ -19,7 +24,8 @@ function download(req, res) {
         params: {
             fileid: req.params.id
         }
-    }
+    };
+
     req.api.loadResource(req, function(result){
         var file = result.data[0];
         var fileName = file.id + "_" + file.userid + "_" + file.name;

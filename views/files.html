@@ -1,15 +1,21 @@
 {% include 'includes/header.html' %}
+
 {% include 'includes/menu.html' %}
+
 <div class="container">
     <div class="starter-template">
         <h1>{{h1}}</h1>
         <input type="file" id="fileElem" multiple style="display:none" onchange="handleFiles(this.files)">
         <button id="upload-button" type="submit" class="btn btn-primary">Select files</button>
+        <div class="file-actions">
+            <button id="actions-button" type="submit" class="btn btn-warning">Files actions</button>
+        </div>
         <div class="progress-wrapper"></div>
         <br>
         <table id="files" class="table .table-condensed .table-hover">
             <thead>
                 <tr>
+                    <th class='file-remove'>Delete</th>
                     <th>Name</th>
                     <th>Size</th>
                     <th>Kind</th>
@@ -19,7 +25,9 @@
             <tbody></tbody>
         </table>
     </div>
+
     {% include 'includes/footer_scripts.html' %}
+
     <script type="text/javascript">
         $(document).ready(function(){
             loadFiles();
@@ -29,25 +37,30 @@
             $.ajax({
                 url: "api/files/get",
                 success: function(result){
-                    console.log(result);
                     if(result.result) {
                         $("#files tbody").children().remove();
+                        toggleActions(result.data.length);
                         if (result.data.length != 0) {
                             for(var file in result.data) {
-                                $("#files tbody").append("<tr>" +
-                                        "<td><a href='files/download/" + result.data[file].id +"/"+
-                                        result.data[file].name + "'>"+result.data[file].name+"</a></td>" +
+                                $("#files tbody").append(
+                                    "<tr data-file='"+result.data[file].id+"'>" +
+                                        "<td class='ar file-remove'>" +
+                                            "<button type='button' class='btn btn-danger' onclick='deleteFile("+result.data[file].id+");'>Delete</button>" +
+                                        "</td>"+
+                                        "<td>" +
+                                            "<a href='files/download/" + result.data[file].id +"/"+result.data[file].name + "'>"+result.data[file].name+"</a>" +
+                                        "</td>" +
                                         "<td class='ar'>"+ result.data[file].size+"</td>" +
                                         "<td class='ar'>"+ result.data[file].mimetype+"</td>" +
                                         "<td class='ar'>"+ result.data[file].created+"</td>" +
-                                        "</tr>");
+                                    "</tr>");
                             }
                         } else {
                             $("#files tbody").append("<h3>This folder is empty</h3>" +
                                     "<p>Hit Select files to upload your files</p>");
                         }
                     } else {
-                        //ops api error
+                        //TODO API ERROR HANDLER
                     }
                 },
                 error: function(result) {
@@ -57,10 +70,15 @@
         }
 
         var uploadButton = document.getElementById("upload-button");
+        var actionsButton = document.getElementById("actions-button");
         var fileElem = document.getElementById("fileElem");
 
         uploadButton.addEventListener("click", function(event){
             fileElem.click();
+        });
+
+        actionsButton.addEventListener("click", function(event){
+            $(".file-remove").toggle();
         });
 
         fileElem.addEventListener("change", function(event) {
@@ -69,11 +87,13 @@
 
         function handleFiles(fileSelect) {
             if(fileSelect.files && fileSelect.files.length > 0) {
-                // Update button text.
-                uploadButton.innerHTML = 'Uploading...';
+                var count = 0;
                 var files = fileSelect.files;
                 var filesNr = files.length;
-                var count = 0;
+
+                // Update button text.
+                uploadButton.innerHTML = 'Uploading...';
+
                 // Loop through each of the selected files.
                 for (var i = 0; i < filesNr; i++) {
                     var file = files[i];
@@ -89,14 +109,14 @@
         }
 
         function sendFormFile(file, callback) {
-            var formData = new FormData();
+            var stringFileName = file.name + Math.floor(Date.now() / 1000);
+
             // Set up the request.
+            var formData = new FormData();
             formData.append('filesselect', file, file.name);
 
-            var stringFileName = file.name + Math.floor(Date.now() / 1000);
-            file.hash = stringFileName.hashCode();
-
             //add progress-bar ui
+            file.hash = stringFileName.hashCode();
             $('.progress-wrapper').append('' +
                 '<div class="progress">' +
                     '<div class="progress-bar" file-name="'+file.hash+'" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">'+file.name+'</div>' +
@@ -104,7 +124,6 @@
             );
 
             var xhr = new XMLHttpRequest();
-
             xhr.upload.onprogress = (function(event) {
                 updateProgress(event, file)
             });
@@ -139,7 +158,7 @@
                 var percentComplete = event.loaded / event.total * 100;
                 $('.progress-bar[file-name="'+file.hash+'"]').width(percentComplete+'%');
             } else {
-                // Unable to compute progress information since the total size is unknown
+                // TODO ERROR HANDLER Unable to compute progress information since the total size is unknown
             }
         }
 
@@ -150,6 +169,7 @@
             }, 1500);
         }
 
+        //creates a unique hashcode for each uploaded file
         String.prototype.hashCode = function(){
             var hash = 0;
             if (this.length == 0) return hash;
@@ -160,6 +180,39 @@
             }
             return hash;
         }
+
+        function toggleActions(itemsNr) {
+            console.log(itemsNr);
+            if ($("#files > tbody > tr").length > 1 || itemsNr > 0) {
+                $('.file-actions').css("display", 'block');
+            } else {
+                $('.file-actions').css("display", 'none');
+                $('.file-remove').css("display", 'none');
+            }
+        }
+
+        function deleteFile (fileId) {
+            $.ajax({
+                type: "POST",
+                data: {fileId: fileId},
+                url: "api/files/remove",
+                success: function(result){
+                    if (result.result) {
+                        if ($("#files > tbody > tr").length > 1) {
+                            $('#files tr[data-file="'+fileId+'"]').remove();
+                        } else {
+                            //TODO AVOID ANOTHER API CALL FOR EMPTY LIST
+                            loadFiles();
+                        }
+                    } else {
+                        //TODO API ERROR HANDLER
+                    }
+                },
+                error: function(result) {
+                    //TODO AJAX ERROR HANDLER
+                }
+            });
+        }
     </script>
 </div>
-{% include 'includes/footer.html' %} 
+{% include 'includes/footer.html' %}

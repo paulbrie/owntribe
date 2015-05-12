@@ -47,3 +47,12 @@
 .progress-wrapper .progress {
   margin-bottom: 5px;
 }
+
+.file-actions {
+  float: right;
+  display: none;
+}
+
+.file-remove {
+  display: none;
+}

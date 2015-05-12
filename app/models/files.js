@@ -1,5 +1,6 @@
 var db = require("./db").db;
 var fs = require('fs');
+
 var files = {
     add: function(callback, params, req) {
         try {
@@ -47,7 +48,7 @@ var files = {
         });
     },
     get: function(callback, params, req) {
-        db.query('select * from files where userid = ' + req.session.user.id,  function(err, selectResult) {
+        db.query('select * from files where deleted = 0 and userid = ' + req.session.user.id,  function(err, selectResult) {
             if(err) {
                 console.log("ERROR:files/get", err);
                 callback({result: false});
@@ -68,8 +69,26 @@ var files = {
                 callback({result: true, data: selectResult});
             }
         });
-
-
+    },
+    remove: function(callback, params, req){
+        this.deleteFile(req.session.user.id, params.fileId, function(result){
+            if (result.result) {
+                callback({result: true});
+            } else {
+                callback({result: false});
+            }
+        });
+    },
+    deleteFile: function(userId, fileId, callback){
+      db.query('update files set deleted = 1 where id = ' + fileId + ' and userid = '+userId, function(err, selectResult) {
+          if(err) {
+              console.log("ERROR:files/delete", err);
+              callback({result: false});
+          } else {
+              console.log("INFO:files/delete");
+              callback({result: true, data: selectResult});
+          }
+      });
     }
 }
 module.exports = files;

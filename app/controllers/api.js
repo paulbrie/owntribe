@@ -7,6 +7,7 @@ function intval(val) {
  * for example tasks_get maps /api/tasks/get with the model tasks and the method getTasks
  */
 var dictionary = {
+
     files_add: {
         expose: true,
         model: 'files',
@@ -36,6 +37,18 @@ var dictionary = {
             }
         },
         authenticated: true
+    },
+    files_remove: {
+      expose: true,
+      model: 'files',
+      method: 'remove',
+      params: {
+        fileId: {
+          constraint: ".+",
+          required: true
+        }
+      },
+      authenticated: true
     },
     messages_send: {
         expose: true,
@@ -214,7 +227,7 @@ function loadResource(req, callback) {
                                 if(externalParams[key].match(regEx) == null) {
                                     console.log("---- is null");
                                     check += "Parameter " + param + " is not accepted. ";
-                                };
+                                }
                                 // else it is a function
                             } else {
                                 if(!endpoint.params[param].constraint(externalParams[key])) {
@@ -242,12 +255,7 @@ function loadResource(req, callback) {
             callback({result: false, msg: 'resource not found'});
         }
         console.log("###### API loadResource END ######\n\n");
-
     }
-
-
-
-
 }
 
 module.exports = function(app) {
@@ -263,5 +271,4 @@ module.exports = function(app) {
         },
         loadResource: loadResource
     };
-};
-
+}
