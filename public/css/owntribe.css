@@ -56,3 +56,40 @@
 .file-remove {
   display: none;
 }
+
+.share {
+  min-width: 120px;
+  text-align: center;
+}
+
+.share .label-share {
+  cursor: pointer;
+  display: none;
+}
+
+.share-link {
+}
+
+.modal-share {
+  top:20%;
+  outline: none;
+}
+
+.shared,
+.get-ico {
+  color: #3c763d;
+}
+
+.get-ico {
+  display: none;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+.link-box {
+  display: block;
+  z-index: 2000;
+  position: absolute;
+  margin-top: -47px;
+  margin-left: -80px;
+}

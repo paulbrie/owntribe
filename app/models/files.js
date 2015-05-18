@@ -1,5 +1,6 @@
 var db = require("./db").db;
 var fs = require('fs');
+var crypto = require('crypto');
 
 var files = {
     add: function(callback, params, req) {
@@ -28,21 +29,25 @@ var files = {
         }
     },
     insertFile: function(userid, file, callback) {
+        var current_date = (new Date()).valueOf().toString(),
+            random = Math.random().toString();
+
+        var hash = crypto.createHash('sha1').update(current_date + random).digest('hex');
+
         var insert = {
             name: file.originalname,
             size: file.size,
             mimetype: file.mimetype,
-            userid: userid
+            userid: userid,
+            hash: hash
         };
-
-        console.log(insert);
 
         db.query('INSERT files SET ?', insert, function(err, insertResult) {
             if(err) {
                 console.log("ERROR:files/insertFile", err);
                 callback({result: false});
             } else {
-                //console.log("INFO:files/insertFile", insertResult);
+                console.log("INFO:files/insertFile", insertResult);
                 callback({result: true, data: insertResult});
             }
         });
@@ -64,9 +69,12 @@ var files = {
             if(err) {
                 console.log("ERROR:files/download", err);
                 callback({result: false});
+            } else if(selectResult.length === 1) {
+              console.log("INFO:files/download", selectResult[0]);
+              callback({result: true, data: selectResult});
             } else {
-                console.log("INFO:files/download", selectResult[0]);
-                callback({result: true, data: selectResult});
+              console.log("ERROR:files/download", 'File not found');
+              callback({result: false});
             }
         });
     },
@@ -89,6 +97,32 @@ var files = {
               callback({result: true, data: selectResult});
           }
       });
+    },
+    share: function(callback, params, req) {
+        db.query('update files set share = ' + params.action + ' where id = ' + params.fileId + ' and userid = '+req.session.user.id,  function(err, selectResult) {
+          if(err) {
+            console.log("ERROR:files/share", err);
+            callback({result: false});
+          } else {
+            console.log("INFO:files/share", selectResult[0]);
+            callback({result: true, data: selectResult});
+          }
+        });
+    },
+    downloadShared: function(callback, params, req) {
+      var hash = params.hash || '';
+        db.query('select * from files where share = 1 and hash = "' + hash + '"',  function(err, selectResult) {
+            if(err) {
+                console.log("ERROR:files/downloadShared", err);
+                callback({result: false});
+            } else if(selectResult.length === 1) {
+                console.log("INFO:files/downloadShared", selectResult[0]);
+                callback({result: true, data: selectResult});
+            } else {
+                console.log("ERROR:files/downloadShared", 'File not found');
+                callback({result: false});
+            }
+        });
     }
 }
 module.exports = files;

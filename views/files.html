@@ -12,7 +12,7 @@
         </div>
         <div class="progress-wrapper"></div>
         <br>
-        <table id="files" class="table .table-condensed .table-hover">
+        <table id="files" class="table table-hover">
             <thead>
                 <tr>
                     <th class='file-remove'>Delete</th>
@@ -20,6 +20,7 @@
                     <th>Size</th>
                     <th>Kind</th>
                     <th>Creation date</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -29,9 +30,41 @@
     {% include 'includes/footer_scripts.html' %}
 
     <script type="text/javascript">
+        var uploadButton,
+            sendButton,
+            actionsButton,
+            fileElem;
+
         $(document).ready(function(){
             loadFiles();
+            addEventsListeners();
         });
+
+        function addRowHandlers() {
+            //show and hide share button
+            $('.file-row').on('mouseover', function(){
+                var $this = $(this);
+                $this.find('.share .label-share').show();
+                $this.find('.share .share-ico').hide();
+                $this.find('.share .get-ico').show();
+
+            }).on('mouseout', function(){
+                var $this = $(this);
+                $this.find('.share .label-share').hide();
+                $this.find('.share .share-ico').show();
+                $this.find('.share .get-ico').hide();
+            });
+
+            //add click event on share button
+            $('.share span').on('click', function(){
+                shareFiles(this);
+            });
+
+            $('.get-ico').on('click', function(event){
+                event.stopPropagation();
+                getLink(this);
+            });
+        }
 
         function loadFiles() {
             $.ajax({
@@ -39,25 +72,46 @@
                 success: function(result){
                     if(result.result) {
                         $("#files tbody").children().remove();
+
                         toggleActions(result.data.length);
+
                         if (result.data.length != 0) {
                             for(var file in result.data) {
+                                var                                shareText = 'Share',
+                                        shareStatus = '',
+                                        shareIco = '',
+                                        getIco = '';
+
+                                if (result.data[file].share == 1) {
+                                    shareText = 'Unshare';
+                                    shareStatus = 'shared';
+                                    shareIco = "<i class='fa fa-share-square share-ico'></i>",
+                                    getIco = '<i class="fa fa-files-o get-ico" data-link= "http://' + window.location.host + '/files/s/' + result.data[file].hash + '" title="Get link" hidden=""></i>';
+                                }
+
                                 $("#files tbody").append(
-                                    "<tr data-file='"+result.data[file].id+"'>" +
+                                    "<tr class='file-row' data-file='"+result.data[file].id+"'>" +
                                         "<td class='ar file-remove'>" +
                                             "<button type='button' class='btn btn-danger' onclick='deleteFile("+result.data[file].id+");'>Delete</button>" +
                                         "</td>"+
                                         "<td>" +
                                             "<a href='files/download/" + result.data[file].id +"/"+result.data[file].name + "'>"+result.data[file].name+"</a>" +
                                         "</td>" +
-                                        "<td class='ar'>"+ result.data[file].size+"</td>" +
-                                        "<td class='ar'>"+ result.data[file].mimetype+"</td>" +
-                                        "<td class='ar'>"+ result.data[file].created+"</td>" +
+                                        "<td class='ar "+shareStatus+"'>"+ result.data[file].size+"</td>" +
+                                        "<td class='ar "+shareStatus+"'>"+ result.data[file].mimetype+"</td>" +
+                                        "<td class='ar "+shareStatus+"'>"+ result.data[file].created+"</td>" +
+                                        "<td class='ar share'>" +
+                                            shareIco +
+                                            "<span data-action='"+shareText.toLowerCase()+"'data-hash='"+result.data[file].hash+"' data-file='"+result.data[file].id+"' data-filename='"+result.data[file].name+"' class='label label-default label-share'>"+shareText+"</span>" +
+                                            getIco +
+                                        "</td>"+
                                     "</tr>");
                             }
+                            addRowHandlers();
                         } else {
-                            $("#files tbody").append("<h3>This folder is empty</h3>" +
-                                    "<p>Hit Select files to upload your files</p>");
+                            $("#files tbody").append("" +
+                                "<h3>This folder is empty</h3>" +
+                                "<p>Hit Select files to upload your files</p>");
                         }
                     } else {
                         //TODO API ERROR HANDLER
@@ -69,21 +123,33 @@
             });
         }
 
-        var uploadButton = document.getElementById("upload-button");
-        var actionsButton = document.getElementById("actions-button");
-        var fileElem = document.getElementById("fileElem");
+        function addEventsListeners() {
+            uploadButton = document.getElementById("upload-button");
+            sendButton = document.getElementById("send-button");
+            actionsButton = document.getElementById("actions-button");
+            fileElem = document.getElementById("fileElem");
 
-        uploadButton.addEventListener("click", function(event){
-            fileElem.click();
-        });
+            uploadButton.addEventListener("click", function(event){
+                fileElem.click();
+            });
 
-        actionsButton.addEventListener("click", function(event){
-            $(".file-remove").toggle();
-        });
+            actionsButton.addEventListener("click", function(event){
+                $(".file-remove").toggle();
+            });
 
-        fileElem.addEventListener("change", function(event) {
-            handleFiles(fileElem);
-        });
+            fileElem.addEventListener("change", function(event) {
+                handleFiles(fileElem);
+            });
+
+            sendButton.addEventListener('click', function(event) {
+                $modal = $('.modal-share');
+                shareFiles($modal);
+            });
+            //hide text link
+            $(document).click( function(){
+                $('.link-box').hide();
+            });
+        }
 
         function handleFiles(fileSelect) {
             if(fileSelect.files && fileSelect.files.length > 0) {
@@ -115,8 +181,10 @@
             var formData = new FormData();
             formData.append('filesselect', file, file.name);
 
-            //add progress-bar ui
+            //create unique hash code for uploaded file
             file.hash = stringFileName.hashCode();
+
+            //add progress-bar ui
             $('.progress-wrapper').append('' +
                 '<div class="progress">' +
                     '<div class="progress-bar" file-name="'+file.hash+'" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">'+file.name+'</div>' +
@@ -182,7 +250,6 @@
         }
 
         function toggleActions(itemsNr) {
-            console.log(itemsNr);
             if ($("#files > tbody > tr").length > 1 || itemsNr > 0) {
                 $('.file-actions').css("display", 'block');
             } else {
@@ -191,7 +258,7 @@
             }
         }
 
-        function deleteFile (fileId) {
+        function deleteFile(fileId) {
             $.ajax({
                 type: "POST",
                 data: {fileId: fileId},
@@ -213,6 +280,75 @@
                 }
             });
         }
+
+    function shareFiles(elem) {
+        console.log(elem);
+        var fileId = $(elem).attr('data-file'),
+            dataAction = $(elem).attr('data-action'),
+            action;
+
+        if (dataAction === 'share') {
+            action = 1;
+        } else {
+            action = 0;
+        }
+
+        $.ajax({
+            type: "POST",
+            data: {fileId: fileId,
+                   action: action},
+            url: "api/files/share",
+            success: function(result){
+                if (result.result) {
+                    loadFiles();
+                    $('.file-row').trigger('hover');
+                } else {
+                    //TODO API ERROR HANDLER
+                }
+            },
+            error: function(result) {
+                //TODO AJAX ERROR HANDLER
+            }
+        });
+    }
+
+    function loadModal(elem) {
+        var fileName = $(elem).attr('data-filename'),
+            fileId = $(elem).attr('data-file'),
+            fileHash = $(elem).attr('data-hash');
+        var $modal = $('.modal-share');
+
+        $modal.find('.modal-title').text('Share a link to "'+fileName+'"');
+        $modal.find('.share-link').attr('data-file', fileId);
+        $modal.find('.share-link').val(window.location.host + '/files/s/'+fileHash);
+
+        $('.modal-share').modal('show');
+    }
+
+    function clearModal($modal) {
+        $modal.find('.modal-title').text('');
+        $modal.find('.share-link').removeAttr('data-file');
+        $modal.find('.share-link').removeAttr('value');
+        $modal.find('.share-link').val('');
+    }
+
+    function getLink(elem) {
+        $('.link-box').hide();
+        var link = $(elem).attr('data-link');
+        var currentElem = $(elem).parent();
+        if (currentElem.find('.link-box').length == 0) {
+            $(currentElem).append('' +
+                    '<div class="link-box">' +
+                        '<span class="label label-info">Link to your file</span>'+
+                        '<input type="url" readonly class="form-control share-link" value="'+link+'">' +
+                    '</div>' +
+                    '').find('input').select();
+        } else {
+            currentElem.find('.link-box').show().find('input').select();
+        }
+    }
+
     </script>
 </div>
+{% include 'includes/share_modal.html' %}
 {% include 'includes/footer.html' %}

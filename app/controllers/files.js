@@ -1,5 +1,6 @@
 var fs = require("fs");
-function render(req, res) {
+
+function render(req, res, opts) {
     var files = fs.readdir("./data/files/", function(err, files){
         if (err) {
             console.log(err);
@@ -9,6 +10,7 @@ function render(req, res) {
         }
     });
 
+
     res.render('files', {
         h1  : "My Files",
         user: req.session.user,
@@ -17,7 +19,6 @@ function render(req, res) {
 }
 
 function download(req, res) {
-    console.log(req);
     req.internalCall = {
         resource: "files",
         method  : "download",
@@ -27,11 +28,37 @@ function download(req, res) {
     };
 
     req.api.loadResource(req, function(result){
-        var file = result.data[0];
-        var fileName = file.id + "_" + file.userid + "_" + file.name;
-        var fileStream = fs.createReadStream("./data/files/" + fileName);
-        fileStream.pipe(res);
+        if (result.result) {
+            var file = result.data[0];
+            var fileName = file.id + "_" + file.userid + "_" + file.name;
+            var fileStream = fs.createReadStream("./data/files/" + fileName);
+            fileStream.pipe(res);
+        } else {
+            res.redirect('/files');
+        }
     });
+}
+
+function downloadShared(req, res) {
+    req.internalCall = {
+        resource: "files",
+        method  : "downloadShared",
+        params: {
+            hash: req.params.hash
+        }
+    };
+
+  req.api.loadResource(req, function(result){
+      if (result.result) {
+          var file = result.data[0];
+          var fileName = file.id + "_" + file.userid + "_" + file.name;
+          var fileStream = fs.createReadStream("./data/files/" + fileName);
+          res.setHeader('Content-disposition', 'attachment; filename=' + file.name);
+          fileStream.pipe(res);
+      } else {
+          res.redirect('/');
+      }
+  });
 }
 
 module.exports = function(app) {
@@ -49,6 +76,9 @@ module.exports = function(app) {
             } else {
                 download(req, res);
             }
+        },
+        downloadShared: function(req, res) {
+            downloadShared(req, res);
         }
     }
 }

@@ -2,6 +2,14 @@ function intval(val) {
     return parseInt(val) > 0;
 }
 
+function isBool(val) {
+  if (val == 0 || val == 1) {
+    return true;
+  }
+
+  return false;
+}
+
 /**
  * defines the list of public and private methods of the api
  * for example tasks_get maps /api/tasks/get with the model tasks and the method getTasks
@@ -38,17 +46,45 @@ var dictionary = {
         },
         authenticated: true
     },
+    files_downloadShared: {
+        expose: false,
+        model: 'files',
+        method: 'downloadShared',
+        params: {
+            hash: {
+                constraint: ".+",
+                required: true
+            }
+        },
+        authenticated: false
+    },
     files_remove: {
       expose: true,
       model: 'files',
       method: 'remove',
       params: {
-        fileId: {
-          constraint: ".+",
-          required: true
-        }
+          fileId: {
+              constraint: ".+",
+              required: true
+          }
       },
       authenticated: true
+    },
+    files_share: {
+        expose: true,
+        model: 'files',
+        method: 'share',
+        params: {
+            fileId: {
+                constraint: ".+",
+                required: true
+            },
+            action: {
+                constraint: isBool,
+                required: true
+            }
+        },
+        authenticated: true
     },
     messages_send: {
         expose: true,

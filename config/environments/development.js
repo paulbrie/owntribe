@@ -14,5 +14,8 @@ module.exports = {
             user: "owntribe",
             password: "owntribe"
         }
+    },
+    classic: {
+      url : "http://localhost:8080"
     }
 }

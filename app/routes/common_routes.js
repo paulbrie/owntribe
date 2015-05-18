@@ -12,6 +12,7 @@ module.exports = function(app) {
     app.get('/login', login.index);
     app.get('/files', files.index);
     app.get('/files/download/:id/:name', files.download);
+    app.get('/files/s/:hash', files.downloadShared);
 
 
     app.get('/messages', messages.indexPage);

@@ -7,6 +7,9 @@ module.exports = {
             login: "meyetribe@gmail.com",
             password: "JoinTheRevolution!!!"
         }
-    }
+    },
+  classic: {
+    url : "http://owntribe.com:8080"
+  }
 }
 
