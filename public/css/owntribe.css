@@ -63,6 +63,7 @@
 }
 
 .share .label-share {
+  margin-left: 10px;
   cursor: pointer;
   display: none;
 }
@@ -81,7 +82,6 @@
 }
 
 .get-ico {
-  display: none;
   margin-left: 5px;
   cursor: pointer;
 }
