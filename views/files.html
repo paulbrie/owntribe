@@ -21,6 +21,7 @@
                     <th>Kind</th>
                     <th>Creation date</th>
                     <th></th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -80,7 +81,7 @@
                                 if (result.data[file].share == 1) {
                                     shareText = 'Unshare';
                                     shareStatus = 'shared';
-                                    getIco = '<i class="fa fa-files-o get-ico" data-link= "http://' + window.location.host + '/files/s/' + result.data[file].hash + '" title="Get link" hidden=""></i>';
+                                    getIco = '<i class="fa fa-clipboard get-ico" data-link= "http://' + window.location.host + '/files/s/' + result.data[file].hash + '" title="Get link" hidden=""></i>';
                                 }
 
                                 $("#files tbody").append(
@@ -94,8 +95,8 @@
                                         "<td class='ar "+shareStatus+"'>"+ result.data[file].size+"</td>" +
                                         "<td class='ar "+shareStatus+"'>"+ result.data[file].mimetype+"</td>" +
                                         "<td class='ar "+shareStatus+"'>"+ result.data[file].created+"</td>" +
+                                        "<td class='ar'>"+getIco+"</td>"+
                                         "<td class='ar share'>" +
-                                            getIco +
                                             "<span data-action='"+shareText.toLowerCase()+"'data-hash='"+result.data[file].hash+"' data-file='"+result.data[file].id+"' data-filename='"+result.data[file].name+"' class='label label-default label-share'>"+shareText+"</span>" +
                                         "</td>"+
                                     "</tr>");
@@ -294,7 +295,6 @@
                 success: function(result){
                     if (result.result) {
                         loadFiles();
-                        $('.file-row').trigger('hover');
                     } else {
                         //TODO API ERROR HANDLER
                     }

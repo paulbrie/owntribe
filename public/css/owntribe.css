@@ -57,8 +57,12 @@
   display: none;
 }
 
+.ar {
+  min-width: 35px;
+}
+
 .share {
-  min-width: 120px;
+  min-width: 85px;
   text-align: center;
 }
 
@@ -91,5 +95,5 @@
   z-index: 2000;
   position: absolute;
   margin-top: -47px;
-  margin-left: -80px;
+  margin-left: -60px;
 }
