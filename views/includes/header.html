@@ -1,28 +1,60 @@
-<!DOCTYPE html>
-<html lang="en" ng-app>
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>{{title}}</title>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Owntribe</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="/">{{_t('home')|capitalize}}</a>
+                </li>
+                {% if user.logged %}
+                <!--<li>
+                    <a href="/timeline">{{_t('timeline')|capitalize}}</a>
+                </li>-->
 
-    <!-- Bootstrap -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-    <link href="css/owntribe.css" rel="stylesheet">
+                <li>
+                    <a href="/tasks">{{_t('tasks')|capitalize}}</a>
+                </li>
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
-    <![endif]-->
-    <style type="text/css">
-        #container {margin-top: 50px}
-    </style>
-</head>
-<body>
-    <div id="container">
+                <li>
+                    <a href="/messages">{{_t('messages')|capitalize}}</a>
+                </li>
+
+                <li>
+                    <a href="/files">{{_t('files')|capitalize}}</a>
+                </li>
+
+                <li>
+                    <a href="/students">{{_t('students')|capitalize}}</a>
+                </li>
+                {% endif %}
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                {% if user.logged %}
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                        <span class="glyphicon glyphicon-user" style="color:white;margin-right:5px"></span>{{user.fname|capitalize}}</a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="#">{{_t('settings'|capitalize)}}</a></li>
+                        <li class="divider"></li>
+                        <li><a href="/login">Logout</a></li>
+                    </ul>
+                </li>
+                {% else %}
+                <li>
+                    <a href="/login">{{_t('login')|capitalize}}</a>
+                </li>
+                {% endif %}
+
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>
 

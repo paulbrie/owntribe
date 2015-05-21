@@ -6,11 +6,13 @@ module.exports = function(app) {
     var messages    = require('../controllers/messages')(app);
     var timeline    = require('../controllers/timeline')(app);
     var files       = require('../controllers/files')(app);
+    var students    = require('../controllers/students')(app);
 
     app.get('/', common.indexPage);
     app.get('/contribute', common.indexPage);
     app.get('/login', login.index);
     app.get('/files', files.index);
+    app.get('/students', students.index);
     app.get('/files/download/:id/:name', files.download);
     app.get('/files/s/:hash', files.downloadShared);
 

@@ -86,6 +86,12 @@ var dictionary = {
         },
         authenticated: true
     },
+    students_get: {
+        expose: true,
+        model: 'students',
+        method: 'get',
+        authenticated: true
+    },
     messages_send: {
         expose: true,
         model: 'messages',
@@ -230,7 +236,6 @@ function loadResource(req, callback) {
     console.log("------- resource/call -------\n", "       " + resource + "/" + method);
     console.log("------- externalParams -------\n", externalParams);
     console.log("------- callback -------\n", callback);
-
 
     var endpoint = dictionary[resource + "_" + method];
     if(!endpoint.expose && !req.internalCall) {
