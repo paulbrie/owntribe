@@ -1,0 +1,37 @@
+{% extends 'includes/layout.html' %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="certificate">
+            <div class="header">
+                <a class="navbar-brand" href="http://scoalainformala.ro/">
+                    <img src="/img/logo_color-website.png">
+                </a>
+            </div>
+            <div class="clearfix"></div>
+            <h1>CERTIFICATE</h1>
+
+           <div class="text-zone">
+               <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam consectetur orci et lacus elementum condimentum. Curabitur venenatis tristique arcu eu semper. Nam eget leo ac risus ultrices dignissim vitae id orci. Donec placerat vulputate erat, eget gravida massa posuere ac. Vestibulum vulputate, ipsum et ultricies condimentum, dolor neque interdum lacus, nec auctor leo sapien nec purus. Etiam maximus mattis rhoncus. Etiam et nulla sed nisi fermentum porttitor.</p>
+               <hr>
+               <h2><span>{{ firstName }} {{ lastName }}</span></h2>
+               <h2>Course: <span>{{ course }}</span></h2>
+               <h2>Date: <span>22-05-2015</span></h2>
+           </div>
+
+            <div class="signature-zone">
+                <h3>Department manager</h3>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+

@@ -101,3 +101,44 @@ body {
   margin-top: -47px;
   margin-left: -60px;
 }
+
+#students tbody td:nth-child(1) {
+   cursor: pointer;
+   color: rgb(126, 63, 152);
+ }
+
+.certificate {
+  -webkit-box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
+  -moz-box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
+  box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.75);
+  color: rgb(85, 85, 85);
+  padding: 10px 20px;
+}
+
+.certificate .header {
+  height: 120px;
+}
+
+.certificate h1 {
+  text-align: center;
+}
+
+.certificate .text-zone {
+  padding: 0 125px;
+  margin-top: 50px;
+  font-size: 18px;
+  line-height: 40px;
+}
+
+.certificate .text-zone span {
+  color: rgb(126, 63, 152);
+}
+
+.certificate .signature-zone {
+  margin-top: 50px;
+}
+
+.certificate .signature-zone h3 {
+  padding: 0 90px;
+  float: right;
+}

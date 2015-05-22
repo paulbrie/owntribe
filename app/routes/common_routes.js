@@ -1,12 +1,13 @@
 module.exports = function(app) {
 
-    var common      = require('../controllers/common')(app);
-    var tasks       = require('../controllers/tasks')(app);
-    var login       = require('../controllers/login')(app);
-    var messages    = require('../controllers/messages')(app);
-    var timeline    = require('../controllers/timeline')(app);
-    var files       = require('../controllers/files')(app);
-    var students    = require('../controllers/students')(app);
+    var common       = require('../controllers/common')(app);
+    var tasks        = require('../controllers/tasks')(app);
+    var login        = require('../controllers/login')(app);
+    var messages     = require('../controllers/messages')(app);
+    var timeline     = require('../controllers/timeline')(app);
+    var files        = require('../controllers/files')(app);
+    var students     = require('../controllers/students')(app);
+    var certificates = require('../controllers/certificates')(app);
 
     app.get('/', common.indexPage);
     app.get('/contribute', common.indexPage);
@@ -16,9 +17,9 @@ module.exports = function(app) {
     app.get('/files/download/:id/:name', files.download);
     app.get('/files/s/:hash', files.downloadShared);
 
-
     app.get('/messages', messages.indexPage);
     app.get('/newsletter', common.indexPage);
+    app.get('/certificates', certificates.index);
 
     app.get('/tasks', tasks.tasks);
     app.get('/tasks/done', tasks.done);
